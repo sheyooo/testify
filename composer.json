@@ -1,0 +1,18 @@
+{
+    "name": "sheyi/testify",
+    "description": "Testify ap",
+    "type": "app",
+    "config": {
+        "vendor-dir": "server/lib/vendor/"
+    },
+    "require": {
+        "slim/slim": "^2.6",
+        "redeyeventures/geopattern": "^1.1",
+        "imgix/imgix-php": "^1.0"
+    },
+    "require-dev": {},
+    "authors": [{
+        "name": "sheyooo",
+        "email": "sheyoootech@gmail.com"
+    }]
+}
