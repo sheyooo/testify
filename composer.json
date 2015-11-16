@@ -2,6 +2,7 @@
     "name": "sheyi/testify",
     "description": "Testify ap",
     "type": "app",
+    "license": "MIT",
     "config": {
         "vendor-dir": "server/lib/vendor/"
     },
