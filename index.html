@@ -68,7 +68,7 @@
                 <div layout="row" flex="35" flex-md="40" flex-sm="40">
                     <div layout="row" flex>
                         <div flex layout="row" layout-align="end center" style="position: relative;">
-                            <div class="btn-parent flat" ng-show="user.authenticated">
+                            <div class="btn-parent flat">
                                 <md-button class="no-m" aria-label="Right Sidenav" ng-click="ui.toggleNav('right')">
                                     <my-icon icon="sort-variant">
                                     </my-icon>
@@ -108,7 +108,7 @@
         </md-sidenav>
         <md-content ui-view="MainContent" flex class="main bg-light-gray" layout="row" layout-fill>
         </md-content>
-        <md-sidenav ui-view="rightNav" layout="column" flex layout-fill class="md-sidenav-right md-whiteframe-z1" md-component-id="right" md-is-locked-open="$mdMedia('gt-md')">
+        <md-sidenav ui-view="rightNav" layout="column" flex layout-fill class="md-sidenav-right md-whiteframe-z1" md-component-id="right" md-is-locked-open="$mdMedia('gt-lg')">
         </md-sidenav>
     </div>
     <!-- <ng-view class="main-layout" layout="row" layout-fill></ng-view> -->
