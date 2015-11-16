@@ -1,0 +1,49 @@
+<md-toolbar class="md-tall md-hue-2" style="overflow: hidden">
+    <div class="blur-container square-img-container" layout="row" layout-fill>
+        <img class="square2" ng-src="{{user.avatar}}" alt="blurred profile img" />
+        <style type="text/css">
+        .blur-container {
+            width: 100%;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+        }
+        
+        .blur-container img {
+            /* width: 100%; */
+            -webkit-filter: blur(5px);
+            -moz-filter: blur(5px);
+            -ms-filter: blur(5px);
+            -o-filter: blur(5px);
+            filter: blur(5px);
+            top: -50% !important;
+            -webkit-transform: scale(1.1) !important;
+            -moz-transform: scale(1.1) !important;
+            -ms-transform: scale(1.1) !important;
+            -o-transform: scale(1.1) !important;
+            transform: scale(1.1) !important;
+        }
+        </style>
+    </div>
+    <div flex layout="column " style="z-index: 10">
+        <a ng-href="{{user.link}}">
+            <div class="img-thumbnail img-circle square-img-container" style="width: 50px">
+                <img class="img-circle pull-right " ng-src="{{ user.avatar }} ">
+            </div>
+        </a>
+        <div class="md-body-1 " style="color: white; text-shadow: 1px 1px 1px black">{{ user.name }}</div>
+        <div class="md-body-2 " style="color: white; text-shadow: 1px 1px 1px black">{{ user.email }}</div>
+    </div>
+</md-toolbar>
+<div layout="column " class="md-primary md-hue-2 ">
+    <md-button ng-repeat="item in menu " style="text-align: left " ng-href="/testify/{{item.link}} ">
+        <my-icon class="text-muted" icon="{{item.icon}}"></my-icon>
+        {{item.title}}
+    </md-button>
+    <md-divider></md-divider>
+    <md-subheader>Management</md-subheader>
+    <md-button ng-repeat="item in admin " ng-click="sideMenuClickButtons(item.action)" style="text-align: left " ng-href="/testify/{{item.link}} ">
+        <my-icon class="text-muted" icon="{{item.icon}}"></my-icon>
+        {{item.title}}
+    </md-button>
+</div>

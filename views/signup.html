@@ -1,0 +1,72 @@
+<md-content layout-fill flex ng-controller="SignupCtrl">
+    <div class="entrance-bg" flex layout="row" layout-padding layout-fill layout-align="center center" style="height: auto;">
+        <md-card flex="40" flex-sm="95" flex-md="60">
+            <md-toolbar class="md-hue-2" layout="row" layout-align="center center">
+                <h3>JOIN TESTIFY</h3>
+            </md-toolbar>
+            <md-card-content>
+                <div layout="column">
+                    <div layout="row" layout-align="center center">
+                        <md-button flex="60" flex-md="75" flex-sm="100" class="md-raised" flex ng-click="signupFb()" style="color: white; background: #4E69A2">
+                            <i class="fa fa-facebook fa-lg mr10"></i> Connect with facebook
+                        </md-button>
+                    </div>
+                    <div layout="row"></div>
+                    <form novalidate name="signupForm" ng-submit="signupForm.$valid && submitForm()">
+                        <div layout="row">
+                            <md-input-container flex>
+                                <label>First Name</label>
+                                <input type="text" md-maxlength="15" name="firstName" ng-model="newUser.firstName" required/>
+                                <div ng-messages="signupForm.firstName.$error">
+                                    <div ng-message="required">This is required.</div>
+                                    <div ng-message="md-maxlength">The name has to be less than 15 characters long.</div>
+                                </div>
+                            </md-input-container>
+                            <md-input-container flex>
+                                <label> Last Name</label>
+                                <input type="text" md-maxlength="15" name="lastName" ng-model="newUser.lastName" required />
+                                <div ng-messages="signupForm.lastName.$error">
+                                    <div ng-message="required">This is required.</div>
+                                    <div ng-message="md-maxlength">The name has to be less than 15 characters long.</div>
+                                </div>
+                            </md-input-container>
+                        </div>
+                        <md-input-container>
+                            <label>Email</label>
+                            <input type="email" name="email" ng-model="newUser.email" required/>
+                            <div ng-messages="signupForm.email.$error">
+                                <div ng-message="required">This is required.</div>
+                                <div ng-message="invalid">This ised.</div>
+                                <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
+                            </div>
+                        </md-input-container>
+                        <md-input-container>
+                            <label>Password</label>
+                            <input type="password" name="password" md-minlength="6" md-maxlength="30" ng-model="newUser.password" required/>
+                            <div ng-messages="signupForm.password.$error">
+                                <div ng-message="required">This is required.</div>
+                                <div ng-message="md-minlength">Your password can't be less than 6 characters</div>
+                                <div ng-message="md-maxlength">Your password can't be more than 30 characters</div>
+                            </div>
+                        </md-input-container>
+                        <md-input-container>
+                            <label>Repeat Password</label>
+                            <input type="password" name="password1" ng-model="newUser.password1" required/>
+                        </md-input-container>
+                        <md-checkbox class="md-hue-1" name="terms" required ng-model="newUser.terms">
+                            I agree to Terms
+                        </md-checkbox>
+                        <div layout="row" layout-align="center center" layout-padding>
+                            <md-button flex="60" flex-md="100" flex-sm="100" class="md-raised md-accent md-hue-1" type="submit">
+                                <i class="fa fa-sign-in fa-lg"></i> Join
+                            </md-button>
+                        </div>
+                        <div layout="column" layout-align="center center">
+                            <a href="" class="text-muted md-body-1">Forgot password?</a>
+                        </div>
+                    </form>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
+</md-content>

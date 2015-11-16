@@ -1,0 +1,245 @@
+[ng\:cloak],
+[ng-cloak],
+[data-ng-cloak],
+[x-ng-cloak],
+.ng-cloak,
+.x-ng-cloak {
+    display: none !important;
+}
+
+.avatar.bordered {
+    border: 3px solid fade(#fff, 50%);
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+// Colors
+$gray: #f4f4f4;
+html {
+    overflow: hidden;
+}
+
+body {
+    height: 100%;
+    padding-top: 64px;
+}
+
+.mdi::before {
+    font-size: 24px !important;
+    position: relative;
+    top: 6px;
+}
+
+
+/* @media only screen and (max-height: 500px) {
+    body {
+        padding-top: 48px;
+    }
+} */
+
+@media only screen and (max-width: 600px) {
+    body {
+        padding-top: 56px;
+    }
+}
+
+@media only screen and (max-width: 600px) and (max-height: 600px) {
+    body {
+        padding-top: 48px;
+    }
+}
+
+.app-header {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 90;
+}
+
+.main-layout {
+    position: relative;
+}
+
+.content-feeds > div:first-child {
+    height: auto !important;
+}
+
+.entrance-bg {
+    background: url('../img/1.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+// Angular
+[ng-click] {
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+// Main content bg color
+.bg-light-gray {
+    background-color: $gray;
+}
+
+// Navigation drawer pattern: https://www.google.com/design/spec/patterns/navigation-drawer.html#navigation-drawer-specs
+md-sidenav {
+    & > md-toolbar {
+        padding: 15px;
+        height: 150px;
+        max-height: 150px;
+    }
+    & md-list-item.md-2-line .md-list-item-text {
+        padding-top: 14px;
+        padding-bottom: 12px;
+    }
+    & md-divider {
+        margin-top: 4px;
+        margin-bottom: 4px;
+    }
+}
+
+// White svg icons in toolbar and fab
+md-sidenav {
+    md-icon {
+        fill: #737373;
+        position: relative;
+    }
+    .md-avatar {
+        height: 64px;
+        width: 64px;
+    }
+}
+
+
+/* More closely matches https://www.google.com/design/spec/components/lists.html#lists-specs */
+
+md-list-item.md-3-line {
+    md-divider {
+        &[md-inset] {
+            left: 70px;
+        }
+    }
+}
+
+// Round avatar
+.square-img-container {
+    position: relative;
+    overflow: hidden;
+    &:before {
+        content: "";
+        display: block;
+        padding-top: 100%;
+        /* initial ratio of 1:1*/
+    }
+    & img.square2 {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        -webkit-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+}
+
+.square-img-container img {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 100%;
+    width: auto;
+    max-width: 200%;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.square-img-container img.potrait {
+    width: 100%;
+    height: auto;
+}
+
+img {
+    width: 100%;
+    height: 100%;
+}
+
+.left-post-toolbar {
+    & >* {
+        width: 100%;
+    }
+}
+
+
+/* fade animation */
+
+.animate-show {
+    transition: 0.75s ease-out opacity;
+    opacity: 1;
+    &.ng-hide {
+        height: 0;
+        min-height: 0;
+        opacity: 0;
+        overflow: hidden;
+    }
+}
+
+.md-button {
+    min-width: 44px;
+}
+
+.composer-img-upload-progress {
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+
+/* custom categories element styling */
+
+.right-sn-categories {
+    background: #EE8277;
+    color: #fff;
+    height: 40px;
+    //display: block;
+    margin: 5px;
+    & .md-button {
+        margin: 0px;
+        width: 100%;
+    }
+    & .cat-middle {
+        background-color: #D3746B;
+    }
+    & a {
+        color: #fff;
+        display: inline-block;
+    }
+}
+
+
+/* flat buttons styling */
+
+.btn-parent.flat {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    margin: 0 auto;
+    height: 100%;
+    width: 60px;
+    & a,
+    & button {
+        height: 100%;
+        width: 100%;
+        margin: 0px;
+    }
+    &:hover {
+        background: #819CAD;
+    }
+}

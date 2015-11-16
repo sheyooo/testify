@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html ng-app="testify" ng-controller="AppCtrl">
+
+<head>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta charset="UTF-8" />
+    <link rel="icon" href="img/favicon.png">
+    <title>Testify | Sharing God's goodness</title>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
+    <link rel="stylesheet" href="bower_components/angular-material/angular-material.css">
+    <link rel="stylesheet" href="plugins/override/angular-loading-bar/loading-bar.css" media='all'>
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/css/font-awesome.min.css">
+    <link href="bower_components/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+</head>
+
+<body ng-cloak layout="column">
+    <md-toolbar class="app-header md-primary md-whiteframe-z1" layout="row">
+        <div class="md-toolbar-tools" layout="row">
+            <div layout="row" flex="30" flex-md="40" flex-sm="15">
+                <div flex layout="row" layout-align="start center">
+                    <md-button class="md-icon-button no-m" aria-label="Settings" ng-click="ui.toggleNav('left')" hide-gt-md ng-show="!ui.showSideNav">
+                        <my-icon icon="menu">
+                        </my-icon>
+                    </md-button>
+                    <div style="height: auto; width: 48px" layout="column" class="mr10" hide-sm>
+                        <img class="" layout-fill src="img/small-logo.png" alt="">
+                    </div>
+                    <div hide-sm layout="column">
+                        <a href="/testify"><h2>Testify</h2></a>
+                        <span hide-sm hide-md class="md-subhead"><i>sharing God's goodness</i></span>
+                    </div>
+                </div>
+            </div>
+            <div style="height: 100%" layout="row" flex="70" flex-md="60" flex-sm="85">
+                <span flex="15" flex-md="0" flex-sm="0"></span>
+                <div layout="row" flex="35" flex-md="60" flex-sm="60">
+                    <div layout="row" flex>
+                        <div flex layout="row" layout-align="center center" style="position: relative;">
+                            <div class="btn-parent flat">
+                                <md-button class="no-m" aria-label="More " ng-click="redirect('/')">
+                                    <my-icon icon="home">
+                                    </my-icon>
+                                </md-button>
+                            </div>
+                        </div>
+                        <div flex layout="row" layout-align="center center" style="position: relative;">
+                            <div class="btn-parent flat" ng-show="user.authenticated">
+                                <md-button class="no-m" aria-label="More " ng-click="redirect('/login')">
+                                    <my-icon icon="email-outline">
+                                    </my-icon>
+                                </md-button>
+                            </div>
+                        </div>
+                        <div flex layout="row" layout-align="center center" style="position: relative;">
+                            <div class="btn-parent flat">
+                                <md-button class="no-m" aria-label="search" ng-click="ui.toggleSearchBox()">
+                                    <my-icon icon="magnify">
+                                    </my-icon>
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <span flex="15" flex-md="0" flex-sm="0"></span>
+                <div layout="row" flex="35" flex-md="40" flex-sm="40">
+                    <div layout="row" flex>
+                        <div flex layout="row" layout-align="end center" style="position: relative;">
+                            <div class="btn-parent flat" ng-show="user.authenticated">
+                                <md-button class="no-m" aria-label="Right Sidenav" ng-click="ui.toggleNav('right')">
+                                    <my-icon icon="sort-variant">
+                                    </my-icon>
+                                </md-button>
+                            </div>
+                        </div>
+                        <div flex layout="row" layout-align="end center" style="position: relative;">
+                            <div class="btn-parent flat">
+                                <md-menu class="no-p">
+                                    <md-button aria-label="Open Menu" ng-click="openMenu($mdOpenMenu, $event)">
+                                        <my-icon md-menu-origin icon="dots-vertical"></my-icon>
+                                    </md-button>
+                                    <md-menu-content width="4">
+                                        <md-menu-item>
+                                            <md-button ng-click="">
+                                                <my-icon class="text-muted" icon="settings"></my-icon>
+                                                Preferences
+                                            </md-button>
+                                        </md-menu-item>
+                                        <md-menu-item>
+                                            <md-button ng-click="logout()">
+                                                <my-icon class="text-muted" icon="logout"></my-icon>
+                                                Logout
+                                            </md-button>
+                                        </md-menu-item>
+                                    </md-menu-content>
+                                </md-menu>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </md-toolbar>
+    <div class="main-layout" layout="row" layout-fill>
+        <md-sidenav ui-view="leftNav" layout="column" flex layout-fill class="md-sidenav-left md-whiteframe-z1" md-component-id="left " md-is-locked-open="$mdMedia('gt-md')">
+        </md-sidenav>
+        <md-content ui-view="MainContent" flex class="main bg-light-gray" layout="row" layout-fill>
+        </md-content>
+        <md-sidenav ui-view="rightNav" layout="column" flex layout-fill class="md-sidenav-right md-whiteframe-z1" md-component-id="right" md-is-locked-open="$mdMedia('gt-md')">
+        </md-sidenav>
+    </div>
+    <!-- <ng-view class="main-layout" layout="row" layout-fill></ng-view> -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <script src="bower_components/angular-messages/angular-messages.min.js"></script>
+    <script src="bower_components/lodash/lodash.min.js"></script>
+    <script src="bower_components/ng-facebook/ngFacebook.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.min.js"></script>
+    <script src="bower_components/slimScroll/jquery.slimScroll.min.js"></script>
+    <script src="bower_components/angular-slimscroll/angular-slimscroll.js"></script>
+    <script src="bower_components/restangular/dist/restangular.min.js"></script>
+    <script src="bower_components/ngstorage/ngStorage.min.js"></script>
+    <script src="bower_components/angular-aria/angular-aria.min.js"></script>
+    <script src="bower_components/angular-material/angular-material.min.js"></script>
+    <script src="bower_components/angular-loading-bar/build/loading-bar.min.js"></script>
+    <script src="bower_components/moment/min/moment.min.js"></script>
+    <script src="bower_components/angular-moment/angular-moment.min.js"></script>
+    <script src="plugins/ng-text-truncate/ng-text-truncate.js"></script>
+    <script src="bower_components/ng-file-upload/ng-file-upload.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="controllers/appCtrl.js"></script>
+    <script src="controllers/controllers.js"></script>
+    <script src="directives/directives.js"></script>
+    <script src="services/services.js"></script>
+    <!--<script>
+    var $buoop = {c: 2};
+    function $buo_f() {
+        var e = document.createElement("script");
+        e.src = "//browser-update.org/update.min.js";
+        document.body.appendChild(e);
+    }
+    try {
+        document.addEventListener("DOMContentLoaded", $buo_f, false);
+    } catch (e) {
+        window.attachEvent("onload", $buo_f);
+    }
+    </script>-->
+</body>
+
+</html>
