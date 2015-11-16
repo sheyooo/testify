@@ -9,7 +9,6 @@ var app = angular.module('testify', ['ngMaterial',
     'ngStorage',
     'restangular',
     'ngFacebook',
-    'ui.slimscroll',
     'ngFileUpload',
     'ngTextTruncate'
 ]);
