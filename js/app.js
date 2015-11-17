@@ -14,8 +14,8 @@ var app = angular.module('testify', ['ngMaterial',
 ]);
 
 //app.constant('apiBase', "http://localhost/testify/api");
-app.constant('appUrl', "http://localhost/testify");
-app.constant('appBase', "/testify");
+app.constant('appUrl', "https://testify-fot-testimonies.herokuapp.com");
+app.constant('appBase', "/");
 app.constant('apiBase', "/testify/api");
 
 app.config(function($facebookProvider, $httpProvider, RestangularProvider, apiBase) {
