@@ -85,39 +85,6 @@ app.directive('testifyPost', ['PostService', 'Auth', function(PostService, Auth)
     };
 }]);
 
-app.directive('trianglify', [function() {
-    return {
-        restrict: 'A',
-        scope: {
-            trianglify: "@"
-        },
-        link: function(scope, element, attrs) {
-            var width, height;
-            seed = scope.trianglify;
-
-            if (!element[0].clientWidth || !element[0].clientHeight) {
-                width = 400;
-                height = 200;
-
-            } else {
-                width = element[0].clientWidth;
-                height = element[0].clientHeight;
-            }
-
-            var pattern = Trianglify({
-                width: width,
-                height: height,
-                variance: 0.8,
-                x_colors: 'random',
-                seed: seed
-            });
-            element[0].appendChild(pattern.canvas());
-            //alert("me");
-        }
-    };
-}]);
-
-
 app.directive('myIcon', ['$timeout', function($timeout) {
     return {
         restrict: 'E',
