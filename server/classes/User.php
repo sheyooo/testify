@@ -99,9 +99,9 @@ class User{
 			return false;
 		}
 	}
-	public function setProfilePicture($id){
+	public function setProfilePicture($url){
 		$conn = Connection::getInstance("write");
-		$command = "UPDATE users SET profile_pic = {$id}
+		$command = "UPDATE users SET avatar = '{$url}'
 		WHERE user_id = {$this->id}";
 		$conn->execUpdate($command);
 	}
@@ -290,7 +290,7 @@ class User{
 		$command = "INSERT INTO users (first_name, last_name, email) VALUES('{$f}', '{$l}', '{$e}')";
 		$result = $conn->execInsert($command);
 		if($result){
-			return true;
+			return $result;
 		}else{
 			return false;
 		}

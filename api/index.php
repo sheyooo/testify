@@ -18,10 +18,35 @@ $app->post('/authenticate', function() use ($app){
 	if($id = App::Login($body->user, $body->password)){
 		$u = new User($id);
 		$token = App::generateToken($id);
-		echo json_encode(array("token" => "{$token}", "user" => $u->getFields()));
+		echo json_encode(array("token" => "{$token}"));
 	}else{
 		$app->response()->status(404);
 	}
+});
+
+$app->post('/fb-token', function() use ($app){
+	$b = json_decode($app->request->getBody());
+	$t = false;
+
+	$fbuser = App::getFbUserFromToken($b->fb_access_token);
+	if($user_id = App::findBySocial('facebook', $fbuser['id'])){
+		$t = App::generateToken($user_id);
+	}else{
+		$user_id = App::createUserFromFbToken($b->fb_access_token);
+		if($user_id){
+			$t = App::generateToken($user_id);
+			//echo json_encode(array("token" => $t));
+		}
+	}
+
+	//echo $t;
+
+	if($t){
+		echo json_encode(array("token" => "{$t}"));
+	}else{
+		echo json_encode(array("status" => "duplicate"));
+	}
+	
 });
 
 $app->get('/tags', function(){
@@ -187,9 +212,9 @@ $app->get('/posts/:id/comments', function($id) use ($app){
 				'user' =>  $u);
 		}
 
-		sleep(1);
-
 		echo json_encode($json);
+
+		sleep(1);
 	}
 
 });

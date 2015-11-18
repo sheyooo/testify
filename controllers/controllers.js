@@ -1,68 +1,5 @@
 app.controller('ComposerCtrl', ['$scope', '$mdDialog', 'Me', 'Upload', 'apiBase', '$timeout', function($scope, $mdDialog, Me, Upload, apiBase, $timeout) {
 
-    $scope.composePost = function() {
-        p = $scope.composer.post;
-        a = $scope.composer.anonymous;
-
-        if (a !== 1 || a !== 0) {
-            a = 0;
-        }
-
-        if (p) {
-            Me.createPost(p, a).then(function(r) {
-                $scope.disabledBtn = true;
-                //console.log(r);
-                //console.log($scope.posts);
-                var composedPost = {
-                    //"post_id": r.data.post_id,
-                    "anonymous": false,
-                    "testimony": p,
-                    "time": Date.now(),
-                    "timestamp": Date.now(),
-                    "user": {
-                        "user_id": Me.id,
-                        "avatar": Me.profile.avatar,
-                        "name": Me.profile.name
-                    }
-                };
-                $scope.posts.unshift(composedPost);
-                console.log($scope.posts);
-
-            }, function(r) {
-
-            });
-        }
-
-    };
-
-    $scope.files = null;
-
-    $scope.uploadFiles = function(files) {
-        $scope.files = files;
-        if (files && files.length) {
-            angular.forEach(files, function(file) {
-                file.upload = Upload.upload({
-                    url: apiBase + '/images',
-                    data: {
-                        file: file
-                    }
-                });
-
-                file.upload.then(function(response) {
-                    file.complete = true;
-                    file.result = response.data;
-
-                }, function(response) {
-                    file.failed = true;
-                }, function(evt) {
-                    file.progress = Math.min(100, parseInt(100.0 *
-                        evt.loaded / evt.total));
-                });
-            });
-        }
-    };
-
-
 }]);
 
 app.controller('PostCtrl', ['AppService', '$scope', 'Restangular', '$mdToast', '$document', function(AppService, $scope, Restangular, $mdToast, $document) {
@@ -93,28 +30,59 @@ app.controller('PostCtrl', ['AppService', '$scope', 'Restangular', '$mdToast', '
     loadPosts();
 }]);
 
-app.controller('LoginCtrl', ['$scope', '$facebook', '$location', 'Auth', 'Me', 'appBase', function($scope, $facebook, $location, Auth, Me, appBase) {
+app.controller('LoginCtrl', ['$scope', 'Facebook', '$location', '$state', 'Auth', 'Me', 'appBase', function($scope, Facebook, $location, $state, Auth, Me, appBase) {
 
     if (Auth.userProfile.authenticated === true) {
-        $location.path(appBase + "/");
+        $state.go('home');
     }
 
 
-    $scope.login = function() {
-        $facebook.login().then(function() {
-            refresh();
-            console.log("scope.login");
+    $scope.loginFb = function() {
+        //console.log("loginctrl");
+
+        Facebook.getLoginStatus(function(r) {
+            //console.log(r);
+            if (r.status === 'connected') {
+                //console.log(r.status);
+                //$scope.loggedIn = true;
+                //console.log(r);
+                Auth.signinFb(r.authResponse.accessToken).then(function(r) {
+                    //console.log(r);
+                }, function(r) {
+                    //console.log(r);
+                });
+            } else {
+                console.log("false;");
+                Facebook.login(function(r) {
+                    //console.log(r);
+                    if (r.status === 'connected') {
+
+                    } else {
+                        return "Login failed";
+                    }
+                });
+                //$scope.loggedIn = false;
+            }
         });
+
+        //console.log($scope.loggedIn);
+
+        /*Facebook.login().then(function() {
+            refresh();
+            console.log("ok");
+        });*/
+        //var v = v++;
+
     };
 
     var refresh = function() {
-        $facebook.api("/me", {
-            fields: 'id,name,email'
+        Facebook.api("/me", {
+            fields: 'id,name,email,access_token'
         }).then(
             function(response) {
                 $scope.welcomeMsg = "Welcome " + response.name;
                 console.log(response);
-                console.log(JSON.stringify(response));
+                //console.log(JSON.stringify(response));
             },
             function(err) {
                 $scope.welcomeMsg = "Please log in";
@@ -124,6 +92,7 @@ app.controller('LoginCtrl', ['$scope', '$facebook', '$location', 'Auth', 'Me', '
     $scope.submitLogin = function() {
         Auth.signin($scope.loginDetails).then(function(r) {
             console.log($scope.user);
+            $state.go('home');
             //Me.callInit();
             //Success Login
         }, function(err) {
@@ -134,22 +103,22 @@ app.controller('LoginCtrl', ['$scope', '$facebook', '$location', 'Auth', 'Me', '
 
 }]);
 
-app.controller('SignupCtrl', ['$scope', '$facebook', 'Auth', '$location', '$mdDialog', function($scope, $facebook, Auth, $location, $mdDialog) {
+app.controller('SignupCtrl', ['$scope', 'Facebook', 'Auth', '$location', '$mdDialog', function($scope, Facebook, Auth, $location, $mdDialog) {
     var refresh;
 
     $scope.newUser = {};
     $scope.signupFb = function() {
-        $facebook.login().then(function() {
+        Facebook.login().then(function() {
             refresh();
         });
     };
 
     refresh = function() {
-        $facebook.api("/me", {
+        Facebook.api("/me", {
             fields: 'id,first_name,last_name,email'
         }).then(
             function(response) {
-                $facebook.logout();
+                Facebook.logout();
                 //$scope.welcomeMsg = "Welcome " + response.name;
                 //console.log(response);
                 //console.log(JSON.stringify(response));

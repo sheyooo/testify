@@ -9,7 +9,9 @@
     "require": {
         "slim/slim": "^2.6",
         "redeyeventures/geopattern": "^1.1",
-        "imgix/imgix-php": "^1.0"
+        "imgix/imgix-php": "^1.0",
+        "facebook/php-sdk-v4": "~5.0",
+        "lcobucci/jwt": "^3.1"
     },
     "require-dev": {},
     "authors": [{

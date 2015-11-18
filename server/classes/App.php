@@ -1,4 +1,5 @@
 <?php 
+
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\ValidationData;
@@ -45,7 +46,87 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 			}
 		}
 
-		public static function registerUserFromFacebook($first_name, $last_name, $email){
+		public static function getFb(){
+			$fb = new Facebook\Facebook([
+			  'app_id' => '180042792329807',
+			  'app_secret' => 'ba22567709fbfd8cab73c1fcd8cb168a',
+			  'default_graph_version' => 'v2.4',
+
+			  ]);
+
+			return $fb;
+		}
+
+		public static function getFbUserFromToken($token){
+			$fb = App::getFb();
+
+			//Use the javascript helper when done with testing if you prefer from the fb sdk for php to get the access token from cookie after setting cookie = true
+			try {
+			    // Returns a `Facebook\FacebookResponse` object
+			    $response = $fb->get('/me?fields=id,name,first_name,last_name,email', $token);
+			} catch(Facebook\Exceptions\FacebookResponseException $e) {
+			    echo 'Graph returned an error: ' . $e->getMessage();
+			    exit;
+			} catch(Facebook\Exceptions\FacebookSDKException $e) {
+			    echo 'Facebook SDK returned an error: ' . $e->getMessage();
+			    exit;
+			}
+			$user = $response->getGraphUser();
+
+			if($user){
+				return $user;
+				//print_r($user);
+			}else{
+				return false;
+			}
+		}
+
+		public static function findBySocial($type, $social_id){
+			$conn = Connection::getInstance("read");
+			$command = "SELECT * FROM social_users 
+						WHERE type = '{$type}' 
+						AND social_id = {$social_id} ";
+			$result  = $conn->execObject($command);
+			if(mysqli_num_rows($result)){
+				$row = mysqli_fetch_assoc($result);
+
+				return $row['user_id'];
+			}else{
+				return false;
+			}
+
+		}
+
+		public static function createUserFromFbToken($token){
+			$fbuser = App::getFbUserFromToken($token);
+			if($fbuser){
+				$f = $fbuser;
+				$fb = App::getFb();
+				$r = $fb->get("/{$f['id']}/picture?type=square&width=500&height=500&redirect=0", $token);
+
+				$fb_pic = $r->getGraphUser()['url'];
+				$user_id = User::create($f['first_name'], $f['last_name'], $f['email']);
+				if($user_id){
+					$conn = Connection::getInstance("write");
+					$command = "INSERT INTO social_users (user_id, social_id, type, name) VALUES(
+						{$user_id}, {$f['id']}, 'facebook', '{$f['name']}')";
+					$conn->execInsert($command);
+
+					$u = new User($user_id);
+					$u->setProfilePicture($fb_pic);
+
+					return $user_id;
+				}else{
+					return false;
+				}
+			}
+
+		}
+
+		public static function registerUserFromFacebook($fb_id, $token, $first_name, $last_name, $email){
+			
+
+			
 
 			if (!filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
 				$conn = Connection::getInstance("write");
@@ -193,8 +274,3 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 
 	}
 
-
-
-
-
-?>

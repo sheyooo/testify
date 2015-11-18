@@ -1,4 +1,4 @@
-app.controller('AppCtrl', function($rootScope, $scope, $mdSidenav, $mdMedia, $location, $q, AppService, Auth, Me, appBase) {
+app.controller('AppCtrl', function($rootScope, $scope, $mdSidenav, $mdMedia, $location, $state, $q, AppService, Auth, Me, appBase) {
     $scope.user = Auth.userProfile;
     $scope.composingPost = false;
 
@@ -15,8 +15,8 @@ app.controller('AppCtrl', function($rootScope, $scope, $mdSidenav, $mdMedia, $lo
         //console.log($scope.user);
     };
 
-    $scope.redirect = function(path) {
-        $location.path(appBase + path);
+    $scope.redirect = function(state) {
+        $state.go(state);
     };
 
     $scope.tags = AppService.getCategories.then(function(cats) {
@@ -38,36 +38,35 @@ app.controller('AppCtrl', function($rootScope, $scope, $mdSidenav, $mdMedia, $lo
 
     $scope.menu = [{
         link: '',
+        state: 'home',
         title: 'Feeds',
         icon: 'message-text',
         click: ''
     }, {
         link: 'entrance',
+        state: 'entrance',
         title: 'Friends',
         icon: 'account-multiple',
         click: ''
     }, {
         link: '',
+        state: '',
         title: 'Messages',
         icon: 'message-text-outline',
         click: ''
     }];
     $scope.admin = [{
         link: 'profile',
+        state: 'profile',
         title: 'Profile',
         icon: 'account',
         action: null
     }, {
         link: 'showListBottomSheet($event)',
+        state: 'settings',
         title: 'Settings',
         icon: 'settings',
         action: null
-    }, {
-        link: 'logout',
-        title: 'Logout',
-        icon: 'logout',
-        action: null
-
     }];
 
 

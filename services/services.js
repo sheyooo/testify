@@ -15,7 +15,7 @@ app.factory('AppService', ['Restangular', function(Restangular) {
     };
 }]);
 
-app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$location', function($http, $localStorage, Restangular, $q, $location) {
+app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', function($http, $localStorage, Restangular, $q, $state) {
     var user = {
         authenticated: false,
         user_id: null,
@@ -123,6 +123,27 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$location',
         return d.promise;
     };
 
+    var signinFb = function(fbtk) {
+        var d = $q.defer();
+        //console.log(fbtk);
+        json = {
+            "fb_access_token": fbtk
+        };
+
+        Restangular.service('fb-token').post(json).then(function(r) {
+            //console.log(r);
+            saveToken(r.data.token);
+            refreshProfile(); //Refresh session data here
+            //$scope.refreshProfile();
+            $state.go('home');
+            d.resolve(r.data.token);
+        }, function(r) {
+            d.reject(r);
+        });
+
+        return d.promise;
+    };
+
     var logout = function() {
         tokenClaims = {};
         delete $localStorage.token;
@@ -145,6 +166,7 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$location',
     return {
         signup: signup,
         signin: signin,
+        signinFb: signinFb,
         logout: logout,
         refreshProfile: refreshProfile,
         resetProfile: resetProfile,
@@ -209,4 +231,12 @@ app.factory('PostService', ['Restangular', '$q', function(Restangular, $q) {
         post: post
     };
 
+}]);
+
+app.factory('SocialService', ['Facebook', 'Auth', function(Facebook, Auth) {
+
+
+    return {
+
+    };
 }]);

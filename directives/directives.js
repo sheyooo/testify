@@ -17,9 +17,19 @@ app.directive('rightSidenav', [function() {
     };
 }]);
 
+app.directive('searchbox', [function() {
+    return {
+        restrict: 'A',
+        templateUrl: 'partials/searchbox.html',
+        link: function(scope, iElement, iAttrs) {
+
+        }
+    };
+}]);
+
 app.directive('testifyPosts', [function() {
     return {
-        restrict: 'E',
+        restrict: 'A',
         transclude: true,
         replace: true,
         templateUrl: 'templates/Post/posts.html'

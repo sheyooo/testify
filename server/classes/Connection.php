@@ -12,20 +12,27 @@ class Connection{
 
 
 	public function __construct($host, $user, $pass, $db){
-		//echo date_default_timezone_set('Africa/Lagos');
-		/*$conn = mysqli_connect($host, $user, $pass, $db) or die("error");
-		mysqli_query($conn , "SET time_zone = '+01:00' ")or die("SET TIMEZONE FAILED");
-		self::$conn = $conn;*/
 
-		$url = parse_url(getenv("CLEARDB_DATABASE_URL"));
+		if(getenv('HEROKU')){
+			$url = parse_url(getenv("CLEARDB_DATABASE_URL"));
 
-		$server = $url["host"];
-		$username = $url["user"];
-		$password = $url["pass"];
-		$db = substr($url["path"], 1);
+			$server = $url["host"];
+			$username = $url["user"];
+			$password = $url["pass"];
+			$db = substr($url["path"], 1);
 
-		$conn = new mysqli($server, $username, $password, $db);
-		self::$conn = $conn;
+			$conn = new mysqli($server, $username, $password, $db);
+			self::$conn = $conn;
+			
+		}else{
+			//echo date_default_timezone_set('Africa/Lagos');
+			$conn = mysqli_connect($host, $user, $pass, $db) or die("error");
+			mysqli_query($conn , "SET time_zone = '+01:00' ")or die("SET TIMEZONE FAILED");
+			self::$conn = $conn;
+		}
+		
+
+
 
 		return $conn;
 

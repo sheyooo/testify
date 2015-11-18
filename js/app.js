@@ -8,18 +8,18 @@ var app = angular.module('testify', ['ngMaterial',
     'ui.router',
     'ngStorage',
     'restangular',
-    'ngFacebook',
+    'facebook',
     'ngFileUpload',
     'ngTextTruncate'
 ]);
 
 //app.constant('apiBase', "http://localhost/testify/api");
 app.constant('appUrl', "https://testify-fot-testimonies.herokuapp.com");
-app.constant('appBase', "");
-app.constant('apiBase', "/api");
+app.constant('appBase', "/testify");
+app.constant('apiBase', "/testify/api");
 
-app.config(function($facebookProvider, $httpProvider, RestangularProvider, apiBase) {
-    $facebookProvider.setAppId(180042792329807);
+app.config(function(FacebookProvider, $httpProvider, RestangularProvider, apiBase) {
+    FacebookProvider.setAppId(180042792329807);
     RestangularProvider.setBaseUrl(apiBase);
 
     $httpProvider.interceptors.push(['$q', '$location', '$localStorage', function($q, $location, $localStorage) {
@@ -58,7 +58,7 @@ app.run(function() {
     // Cut and paste the "Load the SDK" code from the facebook javascript sdk page.
 
     // Load the facebook SDK asynchronously
-    (function(d, s, id) {
+    /*(function(d, s, id) {
         var js, fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) {
             return;
@@ -67,7 +67,7 @@ app.run(function() {
         js.id = id;
         js.src = "//connect.facebook.net/en_US/sdk.js";
         fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
+    }(document, 'script', 'facebook-jssdk'));*/
 });
 
 app.config(function($mdThemingProvider, $mdIconProvider) {
@@ -122,7 +122,6 @@ app.config(function($mdThemingProvider, $mdIconProvider) {
 
     $mdIconProvider.defaultFontSet("mdi", "mdi-");
 });
-
 
 app.config(function($stateProvider, $locationProvider, appBase) {
     $stateProvider

@@ -1,87 +1,70 @@
 <md-content layout="row" class="bg-light-gray pt10" flex layout="row" layout-fill layout-wrap layout-align="center start">
     <span flex="20" flex-md="0" flex-sm="0"></span>
-    <div flex="60" flex-md="100" flex-sm="100" class="main content-feeds bg-light-gray" layout-fil layout="column" style="position: relative">
-        <div layout="row" layout-padding ng-show="ui.showSearch">
-            <div layout="row" layout-align="end center" flex>
-                <md-autocomplete placeholder="Search" flex style="color: #000;" md-min-length="2" md-delay="1000" md-selected-item="selectedItem" md-search-text="query" md-items="item in searchRepo(query)" md-item-text="item.item">
-                    <md-item-template>
-                        <div>
-                            <i class="mdi mdi-{{searchIcons[item.type]}} text-muted mr10"></i>
-                            <span ng-cloak>
-                                {{item.item}}
-                                </span>
-                        </div>
-                    </md-item-template>
-                    <md-not-found>
-                        No matches found.
-                    </md-not-found>
-                </md-autocomplete>
-                <!-- <md-button class="my-icon-button no-m" ng-click="ui.toggleSearchBox()">
-                        <my-icon> clear </my-icon>
-                    </md-button> -->
-            </div>
-        </div>
-        <div>
-            <form name="composer" ng-submit="composePost()" ng-controller="ComposerCtrl">
-                <md-card style="overflow: hidden">
-                    <md-toolbar layout="row" class="md-hue-2">
-                        <div class="md-toolbar-tools">
-                            <div flex layout="row">
-                                <div class="square-img-container mr10" style="width: 40px; height: 40px;">
-                                    <img class="img-circle" ng-src="{{ user.avatar }}">
-                                </div>
-                                <h2>{{ user.name }}</h2>
-                            </div>
-                            <my-icon icon="sunglasses"></my-icon>
-                        </div>
-                    </md-toolbar>
-                    <md-card-content>
-                        <md-input-container class="pb0">
-                            <label>Share your testimony...</label>
-                            <textarea ng-focus="composingPost = true" ng-model="composer.post"></textarea>
-                        </md-input-container>
-                        <!-- <md-divider></md-divider> -->
-                    </md-card-content>
-                    <div ng-show="composingPost">
-                        <div class="images-box" layout="row" layout-wrap>
-                            <div flex="33" flex-sm="50" layout="column" ng-repeat="img in files">
-                                <md-card flex class="bg-light-gray" style="position: relative" layout="row" layout-align="center center">
-                                    <div flex class="square-img-container">
-                                        <img ngf-src="img || 'img/testify.png'" ngf-no-oject-url="true" />
+    <div flex="60" flex-md="100" flex-sm="100" class="main content-feeds bg-light-gray" layout-fill layout="column" style="position: relative">
+        <div style="height: auto">
+            <div searchbox></div>
+            <div>
+                <form name="composer" ng-submit="composePost()" ng-controller="ComposerCtrl">
+                    <md-card style="overflow: hidden">
+                        <md-toolbar layout="row" class="md-hue-2">
+                            <div class="md-toolbar-tools">
+                                <div flex layout="row">
+                                    <div class="square-img-container mr10" style="width: 40px; height: 40px;">
+                                        <img class="img-circle" ng-src="{{ user.avatar }}">
                                     </div>
-                                    <md-progress-circular class="composer-img-upload-progress" md-mode="determinate" ng-hide="img.complete" value="{{img.progress}}"></md-progress-circular>
-                                </md-card>
+                                    <h2>{{ user.name }}</h2>
+                                </div>
+                                <my-icon icon="sunglasses"></my-icon>
                             </div>
-                        </div>
-                        <md-button class="md-primary" accept="image/*" ngf-select="uploadFiles($files)" ngf-keep="'distinct'" ngf-max-size="'2MB'" ng-model="files" multiple="multiple">
-                            <my-icon icon="camera"></my-icon>
-                            Add Image
-                        </md-button>
-                        2MB max image size
-                        <md-divider></md-divider>
-                        <div class="" layout="row">
-                            <span flex></span>
-                            <md-switch name="anonymous" aria-label="Post anonymously" class="text-muted md-caption" ng-model="composer.anonymous" ng-false-value="'0'" ng-true-value="'1'">
-                                Post anonymously
-                                <md-tooltip md-delay="400" md-direction="left" md-autohide="true">
-                                    Make this post anonymous
-                                </md-tooltip>
-                            </md-switch>
-                            <div layout="row" layout-padding>
-                                <button style="color: white;" class="btn btn-primary" type="submit">
-                                    <my-icon icon="send" style="line-height: 0px;
+                        </md-toolbar>
+                        <md-card-content>
+                            <md-input-container class="pb0">
+                                <label>Share your testimony...</label>
+                                <textarea ng-focus="composingPost = true" ng-model="composer.post"></textarea>
+                            </md-input-container>
+                            <!-- <md-divider></md-divider> -->
+                        </md-card-content>
+                        <div ng-show="composingPost">
+                            <div class="images-box" layout="row" layout-wrap>
+                                <div flex="33" flex-sm="50" layout="column" ng-repeat="img in files">
+                                    <md-card flex class="bg-light-gray" style="position: relative" layout="row" layout-align="center center">
+                                        <div flex class="square-img-container">
+                                            <img ngf-src="img || 'img/testify.png'" ngf-no-oject-url="true" />
+                                        </div>
+                                        <md-progress-circular class="composer-img-upload-progress" md-mode="determinate" ng-hide="img.complete" value="{{img.progress}}"></md-progress-circular>
+                                    </md-card>
+                                </div>
+                            </div>
+                            <md-button class="md-primary" accept="image/*" ngf-select="uploadFiles($files)" ngf-keep="'distinct'" ngf-max-size="'2MB'" ng-model="files" multiple="multiple">
+                                <my-icon icon="camera"></my-icon>
+                                Add Image
+                            </md-button>
+                            2MB max image size
+                            <md-divider></md-divider>
+                            <div class="" layout="row">
+                                <span flex></span>
+                                <md-switch name="anonymous" aria-label="Post anonymously" class="text-muted md-caption" ng-model="composer.anonymous" ng-false-value="'0'" ng-true-value="'1'">
+                                    Post anonymously
+                                    <md-tooltip md-delay="400" md-direction="left" md-autohide="true">
+                                        Make this post anonymous
+                                    </md-tooltip>
+                                </md-switch>
+                                <div layout="row" layout-padding>
+                                    <button style="color: white;" class="btn btn-primary" type="submit">
+                                        <my-icon icon="send" style="line-height: 0px;
                                         position: relative;
                                         top: -2px;"></my-icon>
-                                    <span>Post</span>
-                                </button>
+                                        <span>Post</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </md-card>
-            </form>
+                    </md-card>
+                </form>
+            </div>
+            <div testify-posts>
+            </div>
         </div>
-        <testify-posts>
-        </testify-posts>
     </div>
     <span flex="20" flex-md="0" flex-sm="0"></span>
 </md-content>

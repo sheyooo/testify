@@ -22,6 +22,9 @@ class AuthMiddleware extends \Slim\Middleware
                 'method' => 'POST',
                 'url' => "/\/authenticate/"),
             array(
+                'method' => 'POST',
+                'url' => "/\/fb-token/"),
+            array(
                 'method' => 'GET',
                 'url' => "/\/tags/"),
             array(
