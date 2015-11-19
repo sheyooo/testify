@@ -36,7 +36,7 @@ app.directive('testifyPosts', [function() {
     };
 }]);
 
-app.directive('testifyPost', ['PostService', 'Auth', 'Facebook', function(PostService, Auth, Facebook) {
+app.directive('testifyPost', ['PostService', 'Auth', 'Facebook', 'appUrl', function(PostService, Auth, Facebook, appUrl) {
     return {
         restrict: 'A',
         scope: {
@@ -94,8 +94,13 @@ app.directive('testifyPost', ['PostService', 'Auth', 'Facebook', function(PostSe
 
             scope.shareToFb = function() {
                 Facebook.ui({
-                    method: 'share',
-                    href: 'https://developers.facebook.com/docs/',
+                    method: 'feed',
+                    //link: 'https://testify-for-testimonies.herokuapp.com/api/fb-share/56',
+                    link: appUrl,
+                    picture: appUrl + '/img/testify-fb-share-pic.png',
+                    name: 'Testify',
+                    caption: 'Sharing God\'s goodness',
+                    description: scope.post.text + ' (Tesfify is a community for sharing your testimonies and engaging with other people\'s testimonies)'
                 }, function(response) {});
             };
         }
