@@ -170,7 +170,6 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 			}else{
 				return false;
 			}
-
 		}
 
 		public static function search($query){
@@ -191,10 +190,7 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 			}else{
 				return array();
 			}
-
-		}
-
-		
+		}		
 
 		public static function findUserByEmail($email){
 			$conn = Connection::getInstance("read");
@@ -206,7 +202,6 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 			}else{
 				return false;
 			}
-
 		}
 
 		public static function generateToken($uid){
@@ -249,7 +244,6 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 			}
 			//echo $token->getClaim('exp');
 			//return $token;
-
 		}
 
 		public static function isValid($token){
@@ -271,11 +265,7 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 			}
 			catch(Exception $e){
 
-			}
-			
-
-
-			
+			}			
 		}
 
 	}

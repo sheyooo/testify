@@ -1,6 +1,10 @@
 app.factory('AppService', ['Restangular', 'Auth', 'Me', function(Restangular, Auth, Me) {
 
-    Auth.refreshProfile().then(Me.callInit());
+    Auth.refreshProfile().then(function(r) {
+        //Me.callInit();
+        //console.log("letsee");
+    });
+    //console.log("appService");
 
     var search = Restangular.service('search');
 
@@ -49,7 +53,7 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', fu
         return window.atob(output);
     }
 
-    var getClaimsFromToken = function() {
+    function getClaimsFromToken() {
         var token = $localStorage.token;
         var claims = {};
 
@@ -60,7 +64,7 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', fu
         }
 
         return claims;
-    };
+    }
 
     var refreshProfile = function() {
         //console.log("refresh")
@@ -121,7 +125,7 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', fu
             saveToken(r.data.token);
             refreshProfile(); //Refresh session data here
             //$scope.refreshProfile();
-            $location.path('/');
+            $state.go('home');
             d.resolve(r.data.token);
         }, function() {
             d.reject();
@@ -178,48 +182,30 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', fu
         refreshProfile: refreshProfile,
         resetProfile: resetProfile,
         userProfile: user,
-        token: getClaimsFromToken
+        token: getClaimsFromToken()
     };
 }]);
 
 app.factory('Me', ['Auth', 'Restangular', '$q', function(Auth, Restangular, $q) {
 
-    var initialized = false;
-    var me = false;
-    var createPost = false;
-    var uid = false;
+    var uid = Auth.token.user_id;
 
-    var init = function() {
-        //console.log("true");
-        uid = Auth.token.user_id;
-        me = Restangular.one('users', uid);
-        //me.get();
+    var me = Restangular.one('users', uid);
 
-        createPost = function(post, anon) {
-            //console.log(anon);
-            return me.post("posts", {
-                "post": post,
-                "anonymous": anon
-            });
-        };
-
-
-        initialized = true;
-    };
-
-    var callInitPromiseOnLogin = function() {
-        Auth.refreshProfile().then(init());
+    var sendPost = function(o) {
+        return me.post("posts", {
+            "post": o.post,
+            "anonymous": o.anonymous,
+            "images": o.images
+        });
     };
 
     return {
-
-        initialized: initialized,
         id: uid,
         me: me,
-        callInit: callInitPromiseOnLogin,
         authenticated: Auth.userProfile.authenticated,
         profile: Auth.userProfile,
-        createPost: createPost
+        sendPost: sendPost
 
     };
 }]);

@@ -115,6 +115,24 @@ class Post{
 	}
 
 
+	public function registerImages($r){
+		if(is_array($r) && count($r) > 1){
+			$conn = Connection::getInstance("write");
+			//$images = implode("OR", $r);
+		
+			$r = array_map(function($v){
+				return " image_id=" . $v;
+			}, $r);
+			$string = implode(" OR ", $r);
+			//echo $string;
+			$command = "UPDATE images 
+						SET post_id = {$this->id}
+						WHERE " . $string;
+			$r = $conn->execUpdate($command);
+		}
+	}
+
+
 
 
 

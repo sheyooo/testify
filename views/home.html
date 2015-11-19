@@ -2,7 +2,7 @@
     <span flex="20" flex-md="0" flex-sm="0"></span>
     <div flex="60" flex-md="100" flex-sm="100" class="main content-feeds bg-light-gray" layout-fill layout="column" style="position: relative">
         <div style="height: auto">
-            <div searchbox></div>
+            <div searchbox ng-cloak></div>
             <div>
                 <form name="composer" ng-submit="composePost()" ng-controller="ComposerCtrl">
                     <md-card style="overflow: hidden">
@@ -26,8 +26,11 @@
                         </md-card-content>
                         <div ng-show="composingPost">
                             <div class="images-box" layout="row" layout-wrap>
-                                <div flex="33" flex-sm="50" layout="column" ng-repeat="img in files">
+                                <div flex="33" flex-sm="50" layout="column" ng-repeat="img in files track by $index">
                                     <md-card flex class="bg-light-gray" style="position: relative" layout="row" layout-align="center center">
+                                        <md-button class="md-icon-button" md-no-ink aria-label="Remove picture" style="color: white; text-shadow: 0px 1px 1px #000; position: absolute; top: 0px; left: 0px; z-index: 10;" ng-click="removePicture($index)">
+                                            <my-icon icon="close"></my-icon>
+                                        </md-button>
                                         <div flex class="square-img-container">
                                             <img ngf-src="img || 'img/testify.png'" ngf-no-oject-url="true" />
                                         </div>
@@ -35,7 +38,7 @@
                                     </md-card>
                                 </div>
                             </div>
-                            <md-button class="md-primary" accept="image/*" ngf-select="uploadFiles($files)" ngf-keep="'distinct'" ngf-max-size="'2MB'" ng-model="files" multiple="multiple">
+                            <md-button class="md-primary" accept="image/*" ngf-keep="'distinct'" ngf-select ngf-max-size="'2MB'" ng-model="files" multiple="multiple">
                                 <my-icon icon="camera"></my-icon>
                                 Add Image
                             </md-button>
@@ -50,7 +53,7 @@
                                     </md-tooltip>
                                 </md-switch>
                                 <div layout="row" layout-padding>
-                                    <button style="color: white;" class="btn btn-primary" type="submit">
+                                    <button ng-disabled="!user.authenticated" style="color: white;" class="btn btn-primary" type="submit">
                                         <my-icon icon="send" style="line-height: 0px;
                                         position: relative;
                                         top: -2px;"></my-icon>

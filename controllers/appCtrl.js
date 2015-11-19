@@ -50,7 +50,7 @@ app.controller('AppCtrl', function($rootScope, $scope, $mdSidenav, $mdMedia, $lo
         click: ''
     }, {
         link: '',
-        state: '',
+        state: 'home',
         title: 'Messages',
         icon: 'message-text-outline',
         click: ''

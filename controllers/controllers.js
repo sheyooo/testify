@@ -1,4 +1,112 @@
-app.controller('ComposerCtrl', ['$scope', '$mdDialog', 'Me', 'Upload', 'apiBase', '$timeout', function($scope, $mdDialog, Me, Upload, apiBase, $timeout) {
+app.controller('ComposerCtrl', ['$scope', '$mdDialog', '$mdToast', 'Me', 'Upload', 'apiBase', '$timeout', '$document', '$q', function($scope, $mdDialog, $mdToast, Me, Upload, apiBase, $timeout, $document, $q) {
+    $scope.files = [];
+
+    var isUploadFinished = function() {
+        finished = true;
+
+        angular.forEach($scope.files, function(file, key) {
+            if (file.complete !== true) {
+                finished = false;
+            }
+
+        });
+        return finished;
+    };
+
+    $scope.removePicture = function(i) {
+
+        $scope.files.splice(i, 1);
+    };
+
+    var uploadImages = function(files) {
+        var d = $q.defer();
+        var finished = [];
+
+        $scope.files = files;
+        if (files && files.length) {
+            angular.forEach(files, function(file) {
+                file.upload = Upload.upload({
+                    url: apiBase + '/images',
+                    data: {
+                        file: file
+                    }
+                });
+
+                file.upload.then(function(response) {
+                    file.complete = true;
+                    file.result = response.data;
+                    //console.log(response);
+                    finished.push(response.data.image_id);
+
+                    if (files.length == finished.length) {
+                        d.resolve(finished);
+                    }
+                }, function(response) {
+                    file.failed = true;
+                }, function(evt) {
+                    file.progress = Math.min(100, parseInt(100.0 *
+                        evt.loaded / evt.total));
+                });
+            });
+
+            return d.promise;
+
+        }
+    };
+
+    $scope.composePost = function() {
+        post = $scope.composer.post;
+        anonymous = $scope.composer.anonymous;
+
+        if (anonymous !== 1 || anonymous !== 0) {
+            anonymous = 0;
+        }
+
+        var createPost = function(o) {
+            //console.log(Me.sendPost);
+
+            Me.sendPost({
+                post: o.p,
+                anonymous: o.a,
+                images: o.i
+            }).then(function(r) {
+                $scope.disabledBtn = true;
+                //console.log(r);
+                //console.log($scope.posts);
+                if (r.status === 201) {
+                    $scope.posts.unshift(r);
+                    console.log($scope.posts);
+                }
+            }, function(r) {
+
+
+            });
+        };
+
+        if ($scope.files.length) {
+            uploadImages($scope.files).then(
+                function(id_arr) {
+                    //console.log(id_arr);
+                    createPost({
+                        p: post,
+                        a: anonymous,
+                        i: id_arr
+                    });
+                });
+        } else {
+            createPost({
+                p: post,
+                a: anonymous,
+                i: []
+            });
+        }
+
+
+
+    };
+
+
+
 
 }]);
 

@@ -1,6 +1,8 @@
 <?php
 require(__DIR__ . '/../server/lib/vendor/autoload.php');
 require(__DIR__ . "/../server/classes/Middle/AuthMiddleware.php");
+require(__DIR__ . "/../server/config.php");
+
 function my_autoloader($class) {
     include __DIR__ . '/../server/classes/' . $class . '.php';
 }
@@ -46,17 +48,16 @@ $app->post('/fb-token', function() use ($app){
 	}else{
 		echo json_encode(array("status" => "duplicate"));
 	}
-	
 });
 
 $app->get('/fb-share/:post_id', function() use ($app){
 	$app->response->headers->set('Content-Type', 'text/plain');
 
 	echo '<meta property="og:url"                content="http://www.nytimes.com/2015/02/19/arts/international/when-great-minds-dont-think-alike.html" />
-<meta property="og:type"               content="article" />
-<meta property="og:title"              content="When Great Minds Don’t Think Alike" />
-<meta property="og:description"        content="How much does culture influence creative thinking?" />
-<meta property="og:image"              content="http://static01.nyt.com/images/2015/02/19/arts/international/19iht-btnumbers19A/19iht-btnumbers19A-facebookJumbo-v2.jpg" />';
+		<meta property="og:type"               content="article" />
+		<meta property="og:title"              content="When Great Minds Don’t Think Alike" />
+		<meta property="og:description"        content="How much does culture influence creative thinking?" />
+		<meta property="og:image"              content="http://static01.nyt.com/images/2015/02/19/arts/international/19iht-btnumbers19A/19iht-btnumbers19A-facebookJumbo-v2.jpg" />';
 });
 
 $app->get('/tags', function(){
@@ -105,14 +106,28 @@ $app->get('/users/:id/', function($id) use ($app){
 		$app->response->status(404);
 		echo json_encode(["status" => "User not found"]);
 	}
-
 });
 
 $app->post('/users/:id/posts', function($id) use ($app){
-	$b = json_decode($app->request()->getBody());
-	$p = $b->post;
-	$a = $b->anonymous;
-	$u = new User($id);
+	$o = $app->request->getBody();
+	$o = json_decode($o);
+	$u = new User($app->environment()['testify.user_id']);
+
+	$id = $u->createPost([
+			"a" => $o->anonymous,
+			"p" => $o->post,
+			"i" => $o->images
+		]);
+
+	if($id){
+		$app->response->status(201);
+		echo json_encode(["status" => true,
+						"post_id" => $id]);
+	}else{
+		echo json_encode(["status" => false]);
+	}
+
+	
 
 	/*if($id = $u->createPost($p, $a)){
 		$app->response()->status(201);
@@ -142,7 +157,7 @@ $app->get('/posts', function() use ($app){
 			$user_id = $u->getID();
 			$avatar = $u->getProfilePictureURL();
 			$name = $u->getFullname();			 
-		}else{			
+		}else{
 			$user_id = null; 
 			$avatar = "img/favicon.png";
 			$name = "Anonymous Testimony";			 
@@ -159,7 +174,7 @@ $app->get('/posts', function() use ($app){
 			}
 		};
 
-		$j = array(
+		$j = [
 			"post_id" => $post_id,
 			"liked" => $liked,
 			"tapped_into" => $tapped_into,			
@@ -168,19 +183,21 @@ $app->get('/posts', function() use ($app){
 			"taps_count" => $taps,
 			"text" => $text,
 			"time" => $time,
-			"user" => array(
+			"user" => [
 				"user_id" => $user_id,
 				"avatar" => $avatar,
 				"name" => $name
-				),
-			"comments" => array()
-			);
+				],
+			"images" => [],
+			"comments" => []
+			];
 
 		$json[] = $j;
 	}
 
 	echo json_encode($json);
 });
+
 
 $app->post('/posts/:id/likes', function($id) use ($app){
 	if($uid = $app->environment['testify.user_id']){	
@@ -238,31 +255,27 @@ $app->get('/posts/:id/comments', function($id) use ($app){
 
 });
 
-$app->post('/images', function() use ($app){
+$app->post('/images', function() use ($app, $___CONFIG){
 	error_reporting(E_ALL);
 	$filename = $_FILES['file']['name'];
 	  //$tags = $_POST['tags'];  // $tags = array('dark', 'moon');
-	  $destination = __DIR__ . '/../img/profiles/' . $filename;
-	  if(move_uploaded_file( $_FILES['file']['tmp_name'] , $destination )){
-	  	//echo json_encode(array(true));
-	  	array(
-	  		'name',
-	  		'rel_location',
-	  		'location',
+	  $destination = __DIR__ . '/../img/imgix_source/' . $filename;
+	  if(move_uploaded_file( $_FILES['file']['tmp_name'] , $destination ) && $_FILES['file']['size'] <= 2000000){
+	  	$r = ["file_name" => $filename,
+	  			"url" => $___CONFIG['BASE_URL'] . '/img/imgix_source/' . $filename,
+	  			"user_id" => $app->environment['testify.user_id']
+	  			];
 
-	  		);
-	  	App::registerTempImg();
+	  	$id = Image::addTemp($r);
+	  	echo json_encode(["status" => true,
+	  						"image_id" => $id]);
 	  }else{
-	  	echo $_FILES['file']['error'];
-	  	echo $_FILES['file']['tmp_name'];
+	  	//echo $_FILES['file']['error'];
+	  	//echo $_FILES['file']['tmp_name'];
 
-	  	//echo json_encode(array(false));
+	  	echo json_encode(["status" => false]);
 	  }
-	  //sleep(6);
-	  //echo __DIR__;
-
-	  //echo json_encode($filename);
-
+	 
 });
 
 

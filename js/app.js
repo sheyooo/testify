@@ -14,7 +14,7 @@ var app = angular.module('testify', ['ngMaterial',
 ]);
 
 //app.constant('apiBase', "http://localhost/testify/api");
-app.constant('appUrl', "https://testify-fot-testimonies.herokuapp.com");
+app.constant('appUrl', "https://testify-for-testimonies.herokuapp.com");
 app.constant('appBase', "/testify");
 app.constant('apiBase', "/testify/api");
 

@@ -71,16 +71,19 @@ class User{
 		}
 		return $sex;
 	}
-	public function createPost($p, $a){
+	public function createPost($r){
 		$conn = Connection::getInstance("write");
 
-	//if($a == true){$a = 1;}else{$a = 0;};
+		if($r['a'] == true){$r['a'] = 1;}else{$r['a'] = 0;};
 
-		if ($p) {		
-			$command = "INSERT INTO posts (anonymous, testimony, user_id) VALUES({$a}, '{$p}', {$this->id})";
-			$result = $conn->execInsert($command);
-			if($result){
-				return $result;
+		if ($r) {		
+			$command = "INSERT INTO posts (anonymous, text, user_id) VALUES({$r['a']}, '{$r['p']}', {$this->id})";
+			$p_id = $conn->execInsert($command);
+			if($p_id){
+				//return $result;
+				$p = new Post($p_id);
+				$p->registerImages($r['i']);
+				return $p_id;
 			}else{
 				return false;
 			}
