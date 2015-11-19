@@ -103,7 +103,6 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', fu
         user.location = u.state + ' ' + u.country;
         user.email = u.email;
         user.avatar = u.avatar;
-
     };
 
     var saveToken = function(token) {
