@@ -36,34 +36,42 @@ app.controller('LoginCtrl', ['$scope', 'Facebook', '$location', '$state', 'Auth'
         $state.go('home');
     }
 
+    $scope.fb_button = "Login with Facebook";
+
+    Facebook.getLoginStatus(function(r) {
+        //console.log(r);
+        if (r.status === 'connected') {
+            //console.log(r);
+            Facebook.api('/me', function(r) {
+                $scope.fb_logged_in = true;
+                $scope.fb_name = r.name;
+                $scope.fb_button = "Continue as " + $scope.fb_name;
+            });
+            //console.log(r);
+        } else {
+            //console.log("false;");                
+            $scope.fb_logged_in = false;
+            $scope.fb_name = "null";
+            $scope.fb_button = "Login with Facebook";
+        }
+    });
 
     $scope.loginFb = function() {
         //console.log("loginctrl");
 
-        Facebook.getLoginStatus(function(r) {
+        Facebook.login(function(r) {
             //console.log(r);
             if (r.status === 'connected') {
-                //console.log(r.status);
-                //$scope.loggedIn = true;
-                //console.log(r);
                 Auth.signinFb(r.authResponse.accessToken).then(function(r) {
                     //console.log(r);
                 }, function(r) {
                     //console.log(r);
                 });
             } else {
-                console.log("false;");
-                Facebook.login(function(r) {
-                    //console.log(r);
-                    if (r.status === 'connected') {
-
-                    } else {
-                        return "Login failed";
-                    }
-                });
-                //$scope.loggedIn = false;
+                return "Login failed";
             }
         });
+
 
         //console.log($scope.loggedIn);
 

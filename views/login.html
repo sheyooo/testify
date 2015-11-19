@@ -8,7 +8,7 @@
                 <div layout="column">
                     <div class="mb15" layout="row" layout-wrap layout-align="center center">
                         <md-button class="md-raised" flex="60" flex-sm="100" flex-md="75" ng-click="loginFb()" style="color: white; background: #4E69A2">
-                            <i class="fa fa-facebook fa-lg mr10"></i> Login with facebook
+                            <i class="fa fa-facebook fa-lg mr10"></i> {{fb_button}}
                         </md-button>
                     </div>
                     <form novalidate name="loginForm" ng-submit="loginForm.$valid && submitLogin()">

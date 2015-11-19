@@ -105,7 +105,13 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 				$r = $fb->get("/{$f['id']}/picture?type=square&width=500&height=500&redirect=0", $token);
 
 				$fb_pic = $r->getGraphUser()['url'];
-				$user_id = User::create($f['first_name'], $f['last_name'], $f['email']);
+				$details = ["first_name" => "{$f['first_name']}",		"last_name" => "{$f['last_name']}"
+					];
+				if(isset($f['email'])){
+					$details["email"] = $f['email'];
+				}
+				$user_id = User::create($details);
+				//print_r($f);
 				if($user_id){
 					$conn = Connection::getInstance("write");
 					$command = "INSERT INTO social_users (user_id, social_id, type, name) VALUES(

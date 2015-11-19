@@ -36,7 +36,7 @@ app.directive('testifyPosts', [function() {
     };
 }]);
 
-app.directive('testifyPost', ['PostService', 'Auth', function(PostService, Auth) {
+app.directive('testifyPost', ['PostService', 'Auth', 'Facebook', function(PostService, Auth, Facebook) {
     return {
         restrict: 'A',
         scope: {
@@ -58,10 +58,10 @@ app.directive('testifyPost', ['PostService', 'Auth', function(PostService, Auth)
             scope.openCommentBox = function() {
                 scope.showCommentBox = true;
 
-                console.log(scope.post.post_id);
+                //console.log(scope.post.post_id);
 
                 PostService.post(scope.post.post_id).getList('comments').then(function(r) {
-                    console.log(r);
+                    //console.log(r);
 
                     scope.post.comments = r.data;
 
@@ -90,6 +90,13 @@ app.directive('testifyPost', ['PostService', 'Auth', function(PostService, Auth)
                     });
                 }
                 //console.log(scope.post);
+            };
+
+            scope.shareToFb = function() {
+                Facebook.ui({
+                    method: 'share',
+                    href: 'https://developers.facebook.com/docs/',
+                }, function(response) {});
             };
         }
     };

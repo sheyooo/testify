@@ -49,6 +49,14 @@ $app->post('/fb-token', function() use ($app){
 	
 });
 
+$app->get('fb-share/:post_id', function() use ($app){
+	echo '<meta property="og:url"                content="http://www.nytimes.com/2015/02/19/arts/international/when-great-minds-dont-think-alike.html" />
+<meta property="og:type"               content="article" />
+<meta property="og:title"              content="When Great Minds Don’t Think Alike" />
+<meta property="og:description"        content="How much does culture influence creative thinking?" />
+<meta property="og:image"              content="http://static01.nyt.com/images/2015/02/19/arts/international/19iht-btnumbers19A/19iht-btnumbers19A-facebookJumbo-v2.jpg" />';
+});
+
 $app->get('/tags', function(){
 	$tags = App::getTrendingTags();
 	echo(json_encode($tags));
@@ -83,9 +91,18 @@ $app->post('/users/', function () use ($app) {
 
 $app->get('/users/:id/', function($id) use ($app){
 	$u = new User($id);
-	///echo $app->request->getPathInfo();
-	//var_dump($app->request);
-	echo json_encode($u->getFields());
+	
+	if($u->getID()){
+		echo json_encode([
+			"user_id" => $u->getID(),
+			"first_name" => $u->getFirstName(),
+			"last_name" => $u->getLastName(),
+			"email" => $u->getEmail(),
+			"avatar" => $u->getProfilePictureURL()]);
+	}else{
+		$app->response->status(404);
+		echo json_encode(["status" => "User not found"]);
+	}
 
 });
 

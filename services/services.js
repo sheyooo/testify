@@ -1,4 +1,6 @@
-app.factory('AppService', ['Restangular', function(Restangular) {
+app.factory('AppService', ['Restangular', 'Auth', 'Me', function(Restangular, Auth, Me) {
+
+    Auth.refreshProfile().then(Me.callInit());
 
     var search = Restangular.service('search');
 
@@ -65,12 +67,17 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', fu
         var d = $q.defer();
         if (getClaimsFromToken().user_id) {
             //console.log("truthy");
+            //console.log(getClaimsFromToken().user_id);
+
             Restangular.one('users', getClaimsFromToken().user_id).get().then(function(r) {
                 buildAuthProfile(r.data);
                 d.resolve(true);
-                //console.log("build");
-            }, function() {
-                resetProfile();
+                //console.log(getClaimsFromToken().user_id);
+            }, function(r) {
+                if (r.status == 404) {
+                    resetProfile();
+                    logout();
+                }
                 d.resolve(false);
             });
         } else {
@@ -148,7 +155,7 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', fu
         tokenClaims = {};
         delete $localStorage.token;
         refreshProfile();
-        $location.path("/testify/login");
+        $state.go('login');
     };
 
     var resetProfile = function() {
@@ -203,8 +210,6 @@ app.factory('Me', ['Auth', 'Restangular', '$q', function(Auth, Restangular, $q) 
     var callInitPromiseOnLogin = function() {
         Auth.refreshProfile().then(init());
     };
-
-    callInitPromiseOnLogin();
 
     return {
 

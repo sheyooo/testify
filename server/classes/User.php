@@ -19,11 +19,10 @@ class User{
 		$command = "SELECT * FROM users
 					WHERE user_id = {$id}";
 		$result = $conn->execObject($command);
-	//print_r($user);
+	
 		if(mysqli_num_rows($result)){
 			$row = mysqli_fetch_assoc($result);
-			unset($row['password']);
-		//$user = mysqli_fetch_;
+			unset($row['password']);		
 			$this->initialized = true;
 			$this->id = $row['user_id'];
 			$this->first_name = $row['first_name'];
@@ -44,6 +43,7 @@ class User{
 		};
 	}
 	public function getID(){
+
 		return $this->id;
 	}
 	public function getFullname(){
@@ -57,6 +57,10 @@ class User{
 	public function getFirstName(){
 
 		return $this->first_name;
+	}
+	public function getLastName(){
+
+		return $this->last_name;
 	}
 	public function getSex(){
 		$sex = null;
@@ -285,9 +289,21 @@ class User{
 			$conn->execDelete($command);
 		}
 	}
-	public static function create($f, $l, $e){
+	public static function create($r){
 		$conn = Connection::getInstance("write");
-		$command = "INSERT INTO users (first_name, last_name, email) VALUES('{$f}', '{$l}', '{$e}')";
+		$columns;
+		$values;
+
+		foreach ($r as $column => $value) {
+			$columns[] = $column;
+			$values[] = "'" . $value . "'";			
+		}
+
+		$columns = implode(",", $columns);	
+		$values = implode(",", $values);	
+
+
+		$command = "INSERT INTO users ({$columns}) VALUES({$values})";
 		$result = $conn->execInsert($command);
 		if($result){
 			return $result;
