@@ -49,7 +49,9 @@ $app->post('/fb-token', function() use ($app){
 	
 });
 
-$app->get('fb-share/:post_id', function() use ($app){
+$app->get('/fb-share/:post_id', function() use ($app){
+	$app->response->headers->set('Content-Type', 'text/plain');
+
 	echo '<meta property="og:url"                content="http://www.nytimes.com/2015/02/19/arts/international/when-great-minds-dont-think-alike.html" />
 <meta property="og:type"               content="article" />
 <meta property="og:title"              content="When Great Minds Don’t Think Alike" />

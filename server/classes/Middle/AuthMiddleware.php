@@ -25,7 +25,7 @@ class AuthMiddleware extends \Slim\Middleware
                 'method' => 'POST',
                 'url' => "/\/fb-token/"),
             array(
-                'method' => 'POST',
+                'method' => 'GET',
                 'url' => "/\/fb-share\/[0-9]+/"),
             array(
                 'method' => 'GET',
