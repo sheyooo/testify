@@ -15,7 +15,7 @@ class Image {
 		$conn = Connection::getInstance("read");
 
 		$command ="SELECT * FROM images 
-					WHERE image_id = {$this->id}";
+					WHERE image_id = {$id}";
 
 		$result = $conn->execObject($command);
 
@@ -37,15 +37,15 @@ class Image {
 
 	public function getID(){
 
-		return $id;
+		return $this->id;
 	}
 
-	public function getUrl(){		
+	public function getUrl(){
 
-		return $scores;	
+		return $this->url;	
 	}
 
-	public function getFileName(){    	
+	public function getFileName(){
     	
 		return $this->file_name;		
 	}

@@ -6,6 +6,7 @@ class Post{
 	private $time;
 	private $anonymous;
 	private $text;
+	private $images = [];
 
 
 	public function __construct($id){
@@ -19,10 +20,18 @@ class Post{
 			$this->time = $row['time'];
 			$this->anonymous = $row['anonymous'];
 			$this->text = $row['text'];
+
+			$command = "SELECT * FROM images WHERE post_id = {$this->id}";
+			$r = $conn->execObject($command);
+			if(mysqli_num_rows($r)){
+				while ($row = mysqli_fetch_assoc($r)) {
+					$img = new Image($row['image_id']);
+					$this->images[] = $img;
+				}
+			}
 		}else{
 			return false;
 		}
-
 	}
 
 	public function getID(){
@@ -31,18 +40,22 @@ class Post{
 	}
 
 	public function getAuthor(){
+
 		return $this->author;
 	}
 
 	public function isAnonymous(){
+
 		return $this->anonymous;
 	}
 
 	public function getTime(){
+
 		return $this->time;
 	}
 
 	public function getText(){
+
 		return $this->text;
 	}
 
@@ -114,9 +127,13 @@ class Post{
 		return $arr;
 	}
 
+	public function getImages(){
+
+		return $this->images;
+	}
 
 	public function registerImages($r){
-		if(is_array($r) && count($r) > 1){
+		if(is_array($r) && count($r) > 0){
 			$conn = Connection::getInstance("write");
 			//$images = implode("OR", $r);
 		

@@ -21,7 +21,7 @@ app.factory('AppService', ['Restangular', 'Auth', 'Me', function(Restangular, Au
     };
 }]);
 
-app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', function($http, $localStorage, Restangular, $q, $state) {
+app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', 'Facebook', function($http, $localStorage, Restangular, $q, $state, Facebook) {
     var user = {
         authenticated: false,
         user_id: null,
@@ -133,22 +133,30 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', fu
         return d.promise;
     };
 
-    var signinFb = function(fbtk) {
+    var signinFB = function() {
+        //console.log("loginctrl");
         var d = $q.defer();
-        //console.log(fbtk);
-        json = {
-            "fb_access_token": fbtk
-        };
 
-        Restangular.service('fb-token').post(json).then(function(r) {
+        Facebook.login(function(r) {
             //console.log(r);
-            saveToken(r.data.token);
-            refreshProfile(); //Refresh session data here
-            //$scope.refreshProfile();
-            $state.go('home');
-            d.resolve(r.data.token);
-        }, function(r) {
-            d.reject(r);
+            if (r.status === 'connected') {
+                json = {
+                    "fb_access_token": r.authResponse.accessToken
+                };
+                Restangular.service('fb-token').post(json).then(function(r) {
+                    //console.log(r);
+                    saveToken(r.data.token);
+                    refreshProfile(); //Refresh session data here
+                    //$scope.refreshProfile();
+                    //$state.go('home');
+                    d.resolve(r.data.token);
+                }, function(r) {
+                    d.reject(r);
+                });
+            } else {
+                d.reject(false);
+                return "Login failed";
+            }
         });
 
         return d.promise;
@@ -176,7 +184,7 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', fu
     return {
         signup: signup,
         signin: signin,
-        signinFb: signinFb,
+        signinFB: signinFB,
         logout: logout,
         refreshProfile: refreshProfile,
         resetProfile: resetProfile,
@@ -227,6 +235,42 @@ app.factory('SocialService', ['Facebook', 'Auth', function(Facebook, Auth) {
 
 
     return {
+
+    };
+}]);
+
+app.factory('UXService', ['$mdDialog', 'Auth', '$q', function($mdDialog, Auth, $q) {
+
+    var signinModal = function(ev) {
+        var d = $q.defer();
+        $mdDialog.show({
+                controller: 'UXModalLoginCtrl',
+                templateUrl: 'partials/ux.signin.modal.html',
+                parent: angular.element(document.body),
+                targetEvent: ev,
+                clickOutsideToClose: true
+            })
+            .then(function(res) {
+                d.resolve(res);
+            }, function() {
+                d.reject();
+            });
+
+        return d.promise;
+    };
+
+    var UXLoginFB = function() {
+        Auth.signinFB().then(function() {
+            $mdDialog.hide(true);
+        });
+    };
+
+
+
+    return {
+
+        signinModal: signinModal,
+        UXLoginFB: UXLoginFB
 
     };
 }]);

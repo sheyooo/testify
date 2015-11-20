@@ -1,5 +1,9 @@
 app.controller('ComposerCtrl', ['$scope', '$mdDialog', '$mdToast', 'Me', 'Upload', 'apiBase', '$timeout', '$document', '$q', function($scope, $mdDialog, $mdToast, Me, Upload, apiBase, $timeout, $document, $q) {
     $scope.files = [];
+    $scope.newPost = {
+
+        creating: false
+    };
 
     var isUploadFinished = function() {
         finished = true;
@@ -55,31 +59,39 @@ app.controller('ComposerCtrl', ['$scope', '$mdDialog', '$mdToast', 'Me', 'Upload
     };
 
     $scope.composePost = function() {
+        //post = "";
         post = $scope.composer.post;
         anonymous = $scope.composer.anonymous;
 
-        if (anonymous !== 1 || anonymous !== 0) {
+        if (!post) {
+            post = " ";
+        }
+
+        if (anonymous.$viewValue === false || anonymous === false) {
             anonymous = 0;
+        } else {
+            anonymous = 1;
         }
 
         var createPost = function(o) {
             //console.log(Me.sendPost);
+            $scope.newPost.creating = true;
 
             Me.sendPost({
                 post: o.p,
                 anonymous: o.a,
                 images: o.i
             }).then(function(r) {
-                $scope.disabledBtn = true;
+                $scope.newPost.creating = false;
+
                 //console.log(r);
                 //console.log($scope.posts);
                 if (r.status === 201) {
                     $scope.posts.unshift(r);
-                    console.log($scope.posts);
+                    console.log(r);
                 }
             }, function(r) {
-
-
+                $scope.newPost.creating = false;
             });
         };
 
@@ -94,20 +106,19 @@ app.controller('ComposerCtrl', ['$scope', '$mdDialog', '$mdToast', 'Me', 'Upload
                     });
                 });
         } else {
-            createPost({
-                p: post,
-                a: anonymous,
-                i: []
-            });
+            if ($.trim(post)) {
+                createPost({
+                    p: post,
+                    a: anonymous,
+                    i: []
+                });
+            } else {
+                v = "Alert no contenet with ux service future things";
+                alert(v);
+            }
+
         }
-
-
-
     };
-
-
-
-
 }]);
 
 app.controller('PostCtrl', ['AppService', '$scope', 'Restangular', '$mdToast', '$document', function(AppService, $scope, Restangular, $mdToast, $document) {
@@ -138,7 +149,7 @@ app.controller('PostCtrl', ['AppService', '$scope', 'Restangular', '$mdToast', '
     loadPosts();
 }]);
 
-app.controller('LoginCtrl', ['$scope', 'Facebook', '$location', '$state', 'Auth', 'Me', 'appBase', function($scope, Facebook, $location, $state, Auth, Me, appBase) {
+app.controller('LoginCtrl', ['$scope', 'UXService', 'Facebook', '$q', '$state', 'Auth', 'Me', 'appBase', function($scope, UXService, Facebook, $q, $state, Auth, Me, appBase) {
 
     if (Auth.userProfile.authenticated === true) {
         $state.go('home');
@@ -164,31 +175,14 @@ app.controller('LoginCtrl', ['$scope', 'Facebook', '$location', '$state', 'Auth'
         }
     });
 
-    $scope.loginFb = function() {
-        //console.log("loginctrl");
-
-        Facebook.login(function(r) {
-            //console.log(r);
-            if (r.status === 'connected') {
-                Auth.signinFb(r.authResponse.accessToken).then(function(r) {
-                    //console.log(r);
-                }, function(r) {
-                    //console.log(r);
-                });
-            } else {
-                return "Login failed";
-            }
+    $scope.loginFB = function() {
+        Auth.signinFB().then(function() {
+            $state.go('home');
         });
+    };
 
-
-        //console.log($scope.loggedIn);
-
-        /*Facebook.login().then(function() {
-            refresh();
-            console.log("ok");
-        });*/
-        //var v = v++;
-
+    $scope.UXLoginFB = function() {
+        UXService.UXLoginFB();
     };
 
     var refresh = function() {
@@ -274,4 +268,20 @@ app.controller('LogoutCtrl', ['$scope', 'Auth', 'Me', function($scope, Auth, Me)
     Auth.logout();
     //$scope.logout();
     console.log("mayama");
+}]);
+
+app.controller('ProfileCtrl', ['$scope', function($scope) {
+
+}]);
+
+app.controller('UXModalLoginCtrl', ['$scope', '$mdDialog', function($scope, $mdDialog) {
+    $scope.hide = function() {
+        $mdDialog.hide();
+    };
+    $scope.cancel = function() {
+        $mdDialog.cancel();
+    };
+    $scope.answer = function(answer) {
+        $mdDialog.hide(answer);
+    };
 }]);

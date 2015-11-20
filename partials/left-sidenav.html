@@ -37,17 +37,17 @@
         </div>
     </md-toolbar>
     <div layout="column " class="md-primary md-hue-2 ">
-        <md-button ng-repeat="item in menu " style="text-align: left " ui-sref="{{item.state}} ">
-            <my-icon class="text-muted" icon="{{item.icon}}"></my-icon>
-            {{item.title}}
+        <md-button ng-repeat="item in menu " style="text-align: left " ui-sref="{{::item.state}} ">
+            <my-icon class="text-muted" icon="{{::item.icon}}"></my-icon>
+            {{::item.title}}
         </md-button>
         <md-divider></md-divider>
         <md-subheader>Others</md-subheader>
-        <md-button ng-repeat="item in admin " ng-click="sideMenuClickButtons(item.action)" style="text-align: left " ui-sref="{{item.state}} ">
-            <my-icon class="text-muted" icon="{{item.icon}}"></my-icon>
-            {{item.title}}
+        <md-button ng-repeat="item in admin " ng-click="sideMenuClickButtons(item.action)" style="text-align: left " ui-sref="{{::item.state}} ">
+            <my-icon class="text-muted" icon="{{::item.icon}}"></my-icon>
+            {{::item.title}}
         </md-button>
-        <md-button ng-click="logout()" ng-show="user.authenticated" style="text-align: left">
+        <md-button ng-click="::logout()" ng-show="user.authenticated" style="text-align: left">
             <my-icon class="text-muted" icon="logout"></my-icon>
             Logout
         </md-button>

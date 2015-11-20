@@ -1,6 +1,10 @@
 /bower_components
 /.idea
 /.phpintel
+prepros.cfg
+testify.sublime-project
+testify.sublime-workspace
+npm-debug.log
 /server/lib/vendor
 /img/profiles
-/img/imgix_source
+/img/imgix_source/*

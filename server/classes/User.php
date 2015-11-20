@@ -74,9 +74,9 @@ class User{
 	public function createPost($r){
 		$conn = Connection::getInstance("write");
 
-		if($r['a'] == true){$r['a'] = 1;}else{$r['a'] = 0;};
+		if ($r) {
+			if($r['a'] == true){$r['a'] = 1;}else{$r['a'] = 0;};
 
-		if ($r) {		
 			$command = "INSERT INTO posts (anonymous, text, user_id) VALUES({$r['a']}, '{$r['p']}', {$this->id})";
 			$p_id = $conn->execInsert($command);
 			if($p_id){
@@ -172,11 +172,8 @@ class User{
 		}
 	}
 	public function getEmail(){
-		if($this->email){
-			return $this->email;
-		}else{
-			return false;
-		}
+		
+		return $this->email;
 	}
 	public function getChatsID(){
 		$chats = null;

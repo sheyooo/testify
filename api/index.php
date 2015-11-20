@@ -113,6 +113,17 @@ $app->post('/users/:id/posts', function($id) use ($app){
 	$o = json_decode($o);
 	$u = new User($app->environment()['testify.user_id']);
 
+	if($u->getID() != $id){
+		$app->response->status(403);
+		echo json_encode(["status" => false,
+				"description" => "Wrong account"]);
+		return ;
+	}
+
+	if(!isset($o->post)){
+		$o->post = " ";
+	}
+
 	$id = $u->createPost([
 			"a" => $o->anonymous,
 			"p" => $o->post,
@@ -151,6 +162,7 @@ $app->get('/posts', function() use ($app){
 		$taps = $post->countTaps();
 		$text = $post->getText();
 		$time = $post->getTime();
+		$ijson = [];
 
 		if (!$post->isAnonymous()) {
 			$u = new User($post->getAuthor());			
@@ -174,6 +186,18 @@ $app->get('/posts', function() use ($app){
 			}
 		};
 
+		$i = $post->getImages();
+		if(count($i)){
+			foreach ($i as $img) {
+				$ijson[] = [
+						"url" => $img->getUrl(),
+						"alt" => $img->getFileName(),
+						"user_id" => $img->getUserID(),
+						"time" => $img->getTime()
+						];
+					}
+		};
+
 		$j = [
 			"post_id" => $post_id,
 			"liked" => $liked,
@@ -188,7 +212,7 @@ $app->get('/posts', function() use ($app){
 				"avatar" => $avatar,
 				"name" => $name
 				],
-			"images" => [],
+			"images" => $ijson,
 			"comments" => []
 			];
 
@@ -197,7 +221,6 @@ $app->get('/posts', function() use ($app){
 
 	echo json_encode($json);
 });
-
 
 $app->post('/posts/:id/likes', function($id) use ($app){
 	if($uid = $app->environment['testify.user_id']){	
@@ -252,7 +275,6 @@ $app->get('/posts/:id/comments', function($id) use ($app){
 
 		sleep(1);
 	}
-
 });
 
 $app->post('/images', function() use ($app, $___CONFIG){
@@ -274,8 +296,7 @@ $app->post('/images', function() use ($app, $___CONFIG){
 	  	//echo $_FILES['file']['tmp_name'];
 
 	  	echo json_encode(["status" => false]);
-	  }
-	 
+	  } 
 });
 
 

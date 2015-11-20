@@ -3,7 +3,7 @@
     <div flex="60" flex-md="100" flex-sm="100" class="main content-feeds bg-light-gray" layout-fill layout="column" style="position: relative">
         <div style="height: auto">
             <div searchbox ng-cloak></div>
-            <div>
+            <div ng-show="user.authenticated">
                 <form name="composer" ng-submit="composePost()" ng-controller="ComposerCtrl">
                     <md-card style="overflow: hidden">
                         <md-toolbar layout="row" class="md-hue-2">
@@ -46,18 +46,23 @@
                             <md-divider></md-divider>
                             <div class="" layout="row">
                                 <span flex></span>
-                                <md-switch name="anonymous" aria-label="Post anonymously" class="text-muted md-caption" ng-model="composer.anonymous" ng-false-value="'0'" ng-true-value="'1'">
+                                <md-switch name="anonymous" aria-label="Post anonymously" class="text-muted md-caption" ng-model="composer.anonymous">
                                     Post anonymously
                                     <md-tooltip md-delay="400" md-direction="left" md-autohide="true">
                                         Make this post anonymous
                                     </md-tooltip>
                                 </md-switch>
                                 <div layout="row" layout-padding>
-                                    <button ng-disabled="!user.authenticated" style="color: white;" class="btn btn-primary" type="submit">
+                                    <button ng-disabled="!user.authenticated" style="color: white;" class="btn btn-primary" type="submit" layout="row">
+                                        <span ng-hide="newPost.creating">
                                         <my-icon icon="send" style="line-height: 0px;
                                         position: relative;
                                         top: -2px;"></my-icon>
                                         <span>Post</span>
+                                        </span>
+                                        <span ng-show="newPost.creating">
+                                            Sending...
+                                        </span>
                                     </button>
                                 </div>
                             </div>

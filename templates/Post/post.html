@@ -2,10 +2,10 @@
     <div layout="column" layout-align="start top">
         <div layout="row" flex layout-fill class="">
             <div flex="10" flex-sm="15" class="img-circle square-img-container">
-                <img class="img-circle" ng-src="{{post.user.avatar}}">
+                <img class="img-circle square2" ng-src="{{::post.user.avatar}}">
             </div>
             <div flex layout="column" class="ml15">
-                <span class="md-body-1"><a href="">{{post.user.name}}</a></span>
+                <span class="md-body-1"><a href="">{{::post.user.name}}</a></span>
                 <span class="md-caption mb10"><time am-time-ago="post.time"></time> </span>
             </div>
             <div flex="10" layout="row" layout-align="end start">
@@ -33,12 +33,23 @@
                                 Edit post
                             </md-button>
                         </md-menu-item>
+                        <md-menu-item ng-show="(post.user.user_id == user.user_id)">
+                            <md-button md-no-ink ng-click="">
+                                <my-icon icon="close" class="text-muted"></my-icon>
+                                Delete post
+                            </md-button>
+                        </md-menu-item>
                     </md-menu-content>
                 </md-menu>
             </div>
         </div>
         <div flex layout="column" layout-fill class="">
-            <p ng-text-truncate="post.text" ng-tt-words-threshold="30" ng-tt-more-label="Show" ng-tt-less-label="Hide" class="md-body-1 md-accent pl5"></p>
+            <p ng-text-truncate="::post.text" ng-tt-words-threshold="30" ng-tt-more-label="Show" ng-tt-less-label="Hide" class="md-body-1 md-accent pl5"></p>
+            <div layout="row" layout-wrap layout-padding>
+                <div class="square-img-container img-thumbnail" flex-gt-sm="33" flex-sm="50" ng-repeat="img in post.images">
+                    <img ng-src="{{::img.url}}" alt="{{::img.alt}}">
+                </div>
+            </div>
             <md-divider></md-divider>
             <div layout="row">
                 <p class="md-body-2 mb5 mt5 pr10 pl10">{{post.likes_count}} likes</p>
@@ -48,7 +59,7 @@
             <md-divider></md-divider>
         </div>
         <div layout="row" class="pt10">
-            <md-button class="no-m" layout="row" layout-align="start center" ng-click="toggleLike()" ng-class="{'md-accent md-hue-2' : !post.liked,'md-accent' : post.liked}">
+            <md-button class="no-m" layout="row" layout-align="start center" ng-click="toggleLike($event)" ng-class="{'md-accent md-hue-2' : !post.liked,'md-accent' : post.liked}">
                 <my-icon icon="{{post.liked ? 'heart' : 'heart-outline' }} ">
                 </my-icon>
                 <span class="text-muted">like</span>
@@ -83,15 +94,15 @@
         <div class="mt20" ng-repeat="comment in post.comments">
             <div layout="row" flex layout-fill class="">
                 <div flex="10" flex-sm="15" class="square-img-container">
-                    <img class="square2 img-circle " ng-src="{{comment.user.avatar}}">
+                    <img class="square2 img-circle " ng-src="{{::comment.user.avatar}}">
                 </div>
                 <div flex layout="column" class="ml15">
                     <div layout="row" style="display: inline">
-                        <span class="md-body-1 mr5"><a href="">{{comment.user.name}}</a></span>
-                        <p class="md-body-1" ng-text-truncate="comment.text" ng-tt-words-threshold="20" ng-tt-more-label="Show" ng-tt-less-label="Hide"></p>
+                        <span class="md-body-1 mr5"><a href="">{{::comment.user.name}}</a></span>
+                        <p class="md-body-1" ng-text-truncate="::comment.text" ng-tt-words-threshold="20" ng-tt-more-label="Show" ng-tt-less-label="Hide"></p>
                     </div>
                     <span class="md-body-1 pt5">
-                    <time>{{ comment.time | amCalendar }}</time>
+                    <time>{{ ::comment.time | amCalendar }}</time>
                     </span>
                 </div>
             </div>

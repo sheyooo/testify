@@ -36,7 +36,7 @@ app.directive('testifyPosts', [function() {
     };
 }]);
 
-app.directive('testifyPost', ['PostService', 'Auth', 'Facebook', 'appUrl', function(PostService, Auth, Facebook, appUrl) {
+app.directive('testifyPost', ['PostService', 'Auth', 'UXService', 'Facebook', 'appUrl', function(PostService, Auth, UXService, Facebook, appUrl) {
     return {
         restrict: 'A',
         scope: {
@@ -69,25 +69,34 @@ app.directive('testifyPost', ['PostService', 'Auth', 'Facebook', 'appUrl', funct
                 });
             };
 
-            scope.toggleLike = function() {
+            scope.toggleLike = function(ev) {
                 //console.log(scope.post.post_id)
-                if (scope.post.liked) {
-                    scope.post.liked = false;
-                    scope.post.likes_count--;
-                    PostService.post(scope.post.post_id).one('likes').remove().then(function(r) {
-                        //console.log(r);
-                        scope.post.liked = r.data.status;
-                        scope.post.likes_count = r.data.likes;
+                var doLike = function() {
+                    if (scope.post.liked) {
+                        scope.post.liked = false;
+                        scope.post.likes_count--;
+                        PostService.post(scope.post.post_id).one('likes').remove().then(function(r) {
+                            //console.log(r);
+                            scope.post.liked = r.data.status;
+                            scope.post.likes_count = r.data.likes;
+                        });
+                    } else {
+                        scope.post.liked = true;
+                        scope.post.likes_count++;
+                        PostService.post(scope.post.post_id).one('likes').post().then(function(r) {
+                            //console.log("created");
+                            scope.post.liked = r.data.status;
+                            scope.post.likes_count = r.data.likes;
+                        });
+                    }
+                };
+                if (Auth.userProfile.authenticated) {
+                    doLike();
+                } else {
+                    UXService.signinModal(ev).then(function() {
+                        doLike();
                     });
 
-                } else {
-                    scope.post.liked = true;
-                    scope.post.likes_count++;
-                    PostService.post(scope.post.post_id).one('likes').post().then(function(r) {
-                        //console.log("created");
-                        scope.post.liked = r.data.status;
-                        scope.post.likes_count = r.data.likes;
-                    });
                 }
                 //console.log(scope.post);
             };

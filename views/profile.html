@@ -1,62 +1,66 @@
-<md-content flex class="main bg-light-gray" layout-sm="column" layout-gt-md="row" layout-fill>
-    <div searchbox>
+<md-content flex class="main bg-light-gray" layout-sm="column" layout-gt-md="column" layout-fill ng-controller="ProfileCtrl">
+    <div layout="row" layout-align="center center">
+        <div searchbox flex="60">
+        </div>
     </div>
-    <div flex-sm flex-gt-md="40" layout="column" layout-padding>
-        <md-card>
-            <md-card-content>
-                <div layout="row" layout-align="center center ">
-                    <div flex="75" class="square-img-container img-circle img-thumbnail ">
-                        <img class="img-circle" ng-src="{{user.avatar}} " />
+    <div layout-gt-md="row" layout-sm="column">
+        <div flex-sm flex-gt-md="40" layout="column" layout-padding>
+            <md-card>
+                <md-card-content>
+                    <div layout="row" layout-align="center center ">
+                        <div flex="75" class="square-img-container img-circle img-thumbnail ">
+                            <img class="img-circle" ng-src="{{user.avatar}} " />
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <md-button>
-                        message
-                    </md-button>
-                </div>
-                <div class="text-muted ">
-                    <p class="md-title ">
-                        <my-icon class="md-primary md-hue-1 mr25 ">person</my-icon>{{user.name }}</p>
-                    <p>
-                        <my-icon class="md-primary md-hue-1 mr25 ">place</my-icon>Lives in {{user.location}}</p>
-                    <p>
-                        <my-icon class="md-primary md-hue-1 mr25 ">book</my-icon>Favorite Book of the bible: <b>Genesis</b></p>
-                    <p>
-                        <my-icon class="md-primary md-hue-1 mr25 ">bookmark</my-icon>Favorite Verse of the bible: <b>John 3:16</b></p>
-                    <p>
-                        <my-icon class="md-primary md-hue-1 mr25 ">bookmark_outline</my-icon>Favorite Parable: <b>The Prodigal Son</b></p>
-                </div>
-            </md-card-content>
-        </md-card>
-    </div>
-    <div flex-sm flex-gt-md="60" layout="column" layout-padding>
-        <div>
-            <md-toolbar class="md-primary">
-                <div class="md-toolbar-tools" layout="row">
-                    <div flex>
-                        {{profile.user.name}} Adekoya Seyi
-                    </div>
-                    <div flex layout="row" layout-align="end center">
-                        <md-button class="md-icon-button" aria-label="Message {{profile.user.name}}">
-                            <my-icon icon="message-text-outline"></my-icon>
+                    <div>
+                        <md-button>
+                            message
                         </md-button>
-                        <md-menu class="no-p">
-                            <md-button aria-label="Open Menu" ng-click="openMenu($mdOpenMenu, $event)" class="md-icon-button">
-                                <my-icon md-menu-origin icon="dots-horizontal"></my-icon>
-                            </md-button>
-                            <md-menu-content width="2">
-                                <md-menu-item>
-                                    <md-button ng-click="logout()">
-                                        <my-icon class="text-muted" icon="logout"></my-icon>
-                                        Report
-                                    </md-button>
-                                </md-menu-item>
-                            </md-menu-content>
-                        </md-menu>
                     </div>
+                    <div class="text-muted ">
+                        <p class="md-title ">
+                            <my-icon class="md-primary md-hue-1 mr25 ">person</my-icon>{{user.name }}</p>
+                        <p>
+                            <my-icon class="md-primary md-hue-1 mr25 ">place</my-icon>Lives in {{user.location}}</p>
+                        <p>
+                            <my-icon class="md-primary md-hue-1 mr25 ">book</my-icon>Favorite Book of the bible: <b>Genesis</b></p>
+                        <p>
+                            <my-icon class="md-primary md-hue-1 mr25 ">bookmark</my-icon>Favorite Verse of the bible: <b>John 3:16</b></p>
+                        <p>
+                            <my-icon class="md-primary md-hue-1 mr25 ">bookmark_outline</my-icon>Favorite Parable: <b>The Prodigal Son</b></p>
+                    </div>
+                </md-card-content>
+            </md-card>
+        </div>
+        <div flex-sm flex-gt-md="60" layout="column" layout-padding>
+            <div>
+                <md-toolbar class="md-primary">
+                    <div class="md-toolbar-tools" layout="row">
+                        <div flex>
+                            {{profile.user.name}} Adekoya Seyi
+                        </div>
+                        <div flex layout="row" layout-align="end center">
+                            <md-button class="md-icon-button" aria-label="Message {{profile.user.name}}">
+                                <my-icon icon="message-text-outline"></my-icon>
+                            </md-button>
+                            <md-menu class="no-p">
+                                <md-button aria-label="Open Menu" ng-click="openMenu($mdOpenMenu, $event)" class="md-icon-button">
+                                    <my-icon md-menu-origin icon="dots-horizontal"></my-icon>
+                                </md-button>
+                                <md-menu-content width="2">
+                                    <md-menu-item>
+                                        <md-button ng-click="logout()">
+                                            <my-icon class="text-muted" icon="logout"></my-icon>
+                                            Report
+                                        </md-button>
+                                    </md-menu-item>
+                                </md-menu-content>
+                            </md-menu>
+                        </div>
+                    </div>
+                </md-toolbar>
+                <div testify-posts>
                 </div>
-            </md-toolbar>
-            <div testify-posts>
             </div>
         </div>
     </div>
