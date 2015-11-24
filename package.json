@@ -3,6 +3,6 @@
         "bower": ""
     },
     "scripts": {
-        "post_install": "bower install"
+        "postinstall": "bower install"
     }
 }
