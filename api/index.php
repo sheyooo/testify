@@ -287,7 +287,7 @@ $app->delete('/posts/:id', function($id) use ($app){
 	$p = new Post($id);
 	if ($p->getID() && $app->environment()['testify.user_id'] ==$p->getAuthor()->getID()) {
 
-		// /$p->delete();
+		$p->delete();
 		if($p){
 			echo json_encode(['status' => true]);
 		}
