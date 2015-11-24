@@ -27,25 +27,45 @@ app.directive('searchbox', [function() {
     };
 }]);
 
-app.directive('testifyPosts', [function() {
+app.directive('testifyPosts', ['PostService', function(PostService) {
     return {
         restrict: 'A',
         transclude: true,
         replace: true,
-        templateUrl: 'templates/Post/posts.html'
+        templateUrl: 'templates/Post/posts.html',
+        controller: function($scope) {
+            this.SDeletePost = function(post_id) {
+                PostService.post(post_id).remove().then(function(r) {
+                    var i = $scope.posts.map(function(x) {
+                            return x.post_id;
+                        })
+                        .indexOf(post_id);
+                    //array.splice(removeIndex, 1);
+                    $scope.posts.splice(i, 1);
+                    //scope.post = "";
+                });
+
+            };
+
+        }
     };
 }]);
 
 app.directive('testifyPost', ['PostService', 'Auth', 'UXService', 'Facebook', 'appUrl', function(PostService, Auth, UXService, Facebook, appUrl) {
     return {
         restrict: 'A',
+        require: "^?testifyPosts",
         scope: {
-            testifyPost: '=',
+            testifyPost: '='
         },
         templateUrl: 'templates/Post/post.html',
-        link: function(scope, element) {
+        link: function(scope, element, attrs, SuperTPostsCtrl) {
             scope.user = Auth.userProfile;
             scope.post = scope.testifyPost;
+            //scope.commentBox = 
+            scope.CommentsUI = {
+                loading: false
+            };
 
             var originatorEv;
             scope.openPostMenu = function($mdOpenMenu, ev) {
@@ -56,17 +76,56 @@ app.directive('testifyPost', ['PostService', 'Auth', 'UXService', 'Facebook', 'a
 
             scope.showCommentBox = false;
             scope.openCommentBox = function() {
-                scope.showCommentBox = true;
-
                 //console.log(scope.post.post_id);
+                if (scope.showCommentBox === false) {
+                    scope.CommentsUI.loading = true;
+                    PostService.post(scope.post.post_id).getList('comments').then(function(r) {
+                        //console.log(r);
+                        scope.post.comments = r.data;
+                        scope.CommentsUI.loading = false;
 
-                PostService.post(scope.post.post_id).getList('comments').then(function(r) {
-                    //console.log(r);
+                    });
+                }
+                scope.showCommentBox = true;
+            };
 
-                    scope.post.comments = r.data;
+            scope.addComment = function(ev) {
+                var doCommentPost = function() {
+                    //console.log(Date());
+                    if (scope.commentBox) {
+                        PostService.post(scope.post.post_id).post('comments', {
+                            text: scope.commentBox
+                        }).then(function(r) {
+                            //console.log(r);
+                            var comment = {
+                                comment_id: r.data.comment_id,
+                                user_id: Auth.userProfile.user_id,
+                                post_id: scope.post.post_id,
+                                text: r.data.comment,
+                                time: new Date(),
+                                user: {
+                                    user_id: Auth.userProfile.user_id,
+                                    name: Auth.userProfile.name,
+                                    avatar: Auth.userProfile.avatar
+                                }
+                            };
+                            //console.log(comment.text);
+                            scope.post.comments_count++;
+                            scope.post.comments.push(comment);
+                            scope.commentBox = "";
 
-
-                });
+                        });
+                    }
+                };
+                if (Auth.userProfile.authenticated) {
+                    doCommentPost();
+                } else {
+                    UXService.signinModal(ev).then(function() {
+                        doCommentPost();
+                    }, function() {
+                        v = "Unsuccessful login";
+                    });
+                }
             };
 
             scope.toggleLike = function(ev) {
@@ -101,6 +160,38 @@ app.directive('testifyPost', ['PostService', 'Auth', 'UXService', 'Facebook', 'a
                 //console.log(scope.post);
             };
 
+            scope.toggleTap = function(ev) {
+                //console.log(scope.post.post_id)
+                var doTap = function() {
+                    if (scope.post.tapped_into) {
+                        scope.post.tapped_into = false;
+                        scope.post.taps_count--;
+                        PostService.post(scope.post.post_id).one('taps').remove().then(function(r) {
+                            //console.log(r);
+                            scope.post.tapped_into = r.data.status;
+                            scope.post.taps_count = r.data.taps;
+                        });
+                    } else {
+                        scope.post.tapped_into = true;
+                        scope.post.taps_count++;
+                        PostService.post(scope.post.post_id).one('taps').post().then(function(r) {
+                            //console.log("created");
+                            scope.post.tapped_into = r.data.status;
+                            scope.post.taps_count = r.data.taps;
+                        });
+                    }
+                };
+
+                if (Auth.userProfile.authenticated) {
+                    doTap();
+                } else {
+                    UXService.signinModal(ev).then(function() {
+                        doTap();
+                    });
+                }
+                //console.log(scope.post);
+            };
+
             scope.shareToFb = function() {
                 Facebook.ui({
                     method: 'feed',
@@ -112,6 +203,14 @@ app.directive('testifyPost', ['PostService', 'Auth', 'UXService', 'Facebook', 'a
                     description: scope.post.text + ' (Tesfify is a community for sharing your testimonies and engaging with other people\'s testimonies)'
                 }, function(response) {});
             };
+
+            scope.deletePost = function() {
+                SuperTPostsCtrl.SDeletePost(scope.post.post_id);
+
+            };
+
+
+
         }
     };
 }]);

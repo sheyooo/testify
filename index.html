@@ -113,13 +113,11 @@
     <div class="main-layout" layout="row" layout-fill>
         <div ui-view="leftNav" style="height: 100%;">
         </div>
-        <md-content ui-view="MainContent" flex class="main bg-light-gray" layout="row" layout-fill>
+        <md-content ui-view="MainContent" flex class="middle-content bg-light-gray" layout="row" layout-fill>
         </md-content>
         <div ui-view="rightNav" style="height: 100%;">
         </div>
     </div>
-    <!-- <ng-view class="main-layout" layout="row" layout-fill></ng-view> -->
-    <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/angular/angular.min.js"></script>
     <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
     <script src="bower_components/angular-messages/angular-messages.min.js"></script>
@@ -140,6 +138,7 @@
     <script src="controllers/controllers.js"></script>
     <script src="directives/directives.js"></script>
     <script src="services/services.js"></script>
+    <script src="filters/filters.js"></script>
     <!--<script>
     var $buoop = {c: 2};
     function $buo_f() {

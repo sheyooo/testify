@@ -10,7 +10,7 @@ app.factory('AppService', ['Restangular', 'Auth', 'Me', function(Restangular, Au
 
     var getPosts = Restangular.all('posts');
 
-    var getCategories = Restangular.all('tags').getList();
+    var getCategories = Restangular.all('categories').getList();
 
 
     return {
@@ -203,6 +203,7 @@ app.factory('Me', ['Auth', 'Restangular', '$q', function(Auth, Restangular, $q) 
         return me.post("posts", {
             "post": o.post,
             "anonymous": o.anonymous,
+            "category": o.category,
             "images": o.images
         });
     };
@@ -239,7 +240,7 @@ app.factory('SocialService', ['Facebook', 'Auth', function(Facebook, Auth) {
     };
 }]);
 
-app.factory('UXService', ['$mdDialog', 'Auth', '$q', function($mdDialog, Auth, $q) {
+app.factory('UXService', ['$mdDialog', '$mdToast', 'Auth', '$q', '$document', function($mdDialog, $mdToast, Auth, $q, $document) {
 
     var signinModal = function(ev) {
         var d = $q.defer();
@@ -259,9 +260,58 @@ app.factory('UXService', ['$mdDialog', 'Auth', '$q', function($mdDialog, Auth, $
         return d.promise;
     };
 
+    var categorySelectModal = function(ev) {
+        var d = $q.defer();
+        $mdDialog.show({
+                controller: 'UXModalPostCategorizeCtrl',
+                templateUrl: 'partials/ux.post.categorize.modal.html',
+                parent: angular.element('.middle-content'),
+                targetEvent: ev,
+                clickOutsideToClose: true
+            })
+            .then(function(res) {
+                d.resolve(res);
+                //console.log(res);
+            }, function() {
+                d.reject();
+            });
+
+        return d.promise;
+    };
+
+    var alert = function(ev, text) {
+        // Appending dialog to document.body to cover sidenav in docs app
+        // Modal dialogs should fully cover application
+        // to prevent interaction outside of dialog
+        $mdDialog.show(
+            $mdDialog.alert()
+            .parent(angular.element(document.querySelector('body')))
+            .clickOutsideToClose(true)
+            .title(text)
+            //.content(text)
+            .ariaLabel(text)
+            .ok('OK')
+            .targetEvent(ev)
+        );
+    };
+
+    var toast = function(text) {
+
+        $mdToast.show(
+            $mdToast.simple()
+            .content(text)
+            .position('top left')
+            .parent($document[0].querySelector('.main'))
+            .hideDelay(3000)
+        );
+
+    };
+
     var UXLoginFB = function() {
         Auth.signinFB().then(function() {
             $mdDialog.hide(true);
+        }, function() {
+            d = "Do nothing";
         });
     };
 
@@ -270,6 +320,9 @@ app.factory('UXService', ['$mdDialog', 'Auth', '$q', function($mdDialog, Auth, $
     return {
 
         signinModal: signinModal,
+        filePostModal: categorySelectModal,
+        alert: alert,
+        toast: toast,
         UXLoginFB: UXLoginFB
 
     };

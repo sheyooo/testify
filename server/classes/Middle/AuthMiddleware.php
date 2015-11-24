@@ -17,7 +17,10 @@ class AuthMiddleware extends \Slim\Middleware
         //The Response object
         $res = $app->response;
 
-        $open_access_endpoints = array(
+        $open_access_endpoints = [
+            ["method" => "GET",
+                "url" => "/\/cele/"],
+
             array(
                 'method' => 'POST',
                 'url' => "/\/authenticate/"),
@@ -29,7 +32,7 @@ class AuthMiddleware extends \Slim\Middleware
                 'url' => "/\/fb-share\/[0-9]+/"),
             array(
                 'method' => 'GET',
-                'url' => "/\/tags/"),
+                'url' => "/\/categories/"),
             array(
                 'method' => 'GET',
                 'url' => "/\/search/"),
@@ -45,7 +48,7 @@ class AuthMiddleware extends \Slim\Middleware
             array(
                 'method' => 'GET',
                 'url' => "/\/users\/[0-9]+\z/"),
-            );
+            ];
 
         $bearer_token = $app->request->headers->get('Authorization');
 

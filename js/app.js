@@ -123,7 +123,7 @@ app.config(function($mdThemingProvider, $mdIconProvider) {
     $mdIconProvider.defaultFontSet("mdi", "mdi-");
 });
 
-app.config(function($stateProvider, $locationProvider, appBase) {
+app.config(function($stateProvider, $urlRouterProvider, $locationProvider, appBase) {
     $stateProvider
         .state('home', {
             url: appBase + '/',
@@ -180,9 +180,22 @@ app.config(function($stateProvider, $locationProvider, appBase) {
                 },
                 "rightNav": {}
             }
-        }).state('profile', {
-            url: appBase + '/profile',
-            templateUrl: 'views/profile.html',
+        }).state('user', {
+            url: appBase + '/user',
+            views: {
+                "leftNav": {
+                    templateUrl: "partials/left-sidenav.html"
+                },
+                "MainContent": {
+                    templateUrl: "views/profile.html"
+                },
+                "rightNav": {
+                    templateUrl: "partials/right-sidenav.html"
+
+                }
+            }
+        }).state('user.details', {
+            url: '/:user_id',
             views: {
                 "leftNav": {
                     templateUrl: "partials/left-sidenav.html"
@@ -196,9 +209,8 @@ app.config(function($stateProvider, $locationProvider, appBase) {
                 }
             }
         });
-    /*.otherwise({
-                redirectTo: appBase + '/'
-            });*/
+
+    $urlRouterProvider.otherwise(appBase + "/");
 
     $locationProvider.html5Mode({
         enabled: true,

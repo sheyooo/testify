@@ -7,6 +7,7 @@ class Post{
 	private $anonymous;
 	private $text;
 	private $images = [];
+	private $category_id;
 
 
 	public function __construct($id){
@@ -20,6 +21,7 @@ class Post{
 			$this->time = $row['time'];
 			$this->anonymous = $row['anonymous'];
 			$this->text = $row['text'];
+			$this->category_id = $row['cat_id'];
 
 			$command = "SELECT * FROM images WHERE post_id = {$this->id}";
 			$r = $conn->execObject($command);
@@ -40,8 +42,11 @@ class Post{
 	}
 
 	public function getAuthor(){
-
-		return $this->author;
+		if(!$this->anonymous){
+			return new User($this->author);
+		}else{
+			return false;
+		}
 	}
 
 	public function isAnonymous(){
@@ -75,6 +80,20 @@ class Post{
 		$r = $conn->execObject($command);
 
 		return mysqli_fetch_assoc($r)['comments'];
+	}
+
+	public function addComment($r){
+		if(is_array($r) && $r['text'] && $r['user_id']){
+
+			$conn = Connection::getInstance("write");
+			$command = "INSERT INTO comments (post_id, user_id, text) VALUES({$this->id}, {$r['user_id']}, '{$r['text']}')";
+			$id = $conn->execInsert($command);
+			if($id){
+				return $id;
+			}else{
+				return false;
+			}
+		}
 	}
 
 	public function countTaps(){
@@ -146,6 +165,33 @@ class Post{
 						SET post_id = {$this->id}
 						WHERE " . $string;
 			$r = $conn->execUpdate($command);
+		}
+	}
+
+	public function getCategory(){
+
+		return new Category($this->category_id);
+	}
+
+	public function setCategory($id){
+		if($this->id){
+			$conn = Connection::getInstance("write");
+			$command = "UPDATE posts 
+						SET cat_id = '{$id}'
+						WHERE post_id = {$this->id}";
+			$r = $conn->execUpdate($command);
+		}
+
+	}
+
+
+	public function delete(){
+		$conn = Connection::getInstance("write");
+		$command = "DELETE FROM posts 
+					WHERE post_id = {$this->id}";
+		$r = $conn->execDelete($command);
+		if($r){
+			return true;
 		}
 	}
 

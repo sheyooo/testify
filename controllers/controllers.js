@@ -1,9 +1,13 @@
-app.controller('ComposerCtrl', ['$scope', '$mdDialog', '$mdToast', 'Me', 'Upload', 'apiBase', '$timeout', '$document', '$q', function($scope, $mdDialog, $mdToast, Me, Upload, apiBase, $timeout, $document, $q) {
+app.controller('ComposerCtrl', ['$scope', 'UXService', 'AppService', '$mdToast', 'Me', 'Upload', 'apiBase', '$timeout', '$document', '$q', function($scope, UXService, AppService, $mdToast, Me, Upload, apiBase, $timeout, $document, $q) {
     $scope.files = [];
     $scope.newPost = {
-
         creating: false
     };
+
+    AppService.getCategories.then(function(cats) {
+        $scope.categories = cats.data;
+        //console.log(tags);
+    });
 
     var isUploadFinished = function() {
         finished = true;
@@ -58,7 +62,7 @@ app.controller('ComposerCtrl', ['$scope', '$mdDialog', '$mdToast', 'Me', 'Upload
         }
     };
 
-    $scope.composePost = function() {
+    $scope.composePost = function(ev) {
         //post = "";
         post = $scope.composer.post;
         anonymous = $scope.composer.anonymous;
@@ -77,22 +81,31 @@ app.controller('ComposerCtrl', ['$scope', '$mdDialog', '$mdToast', 'Me', 'Upload
             //console.log(Me.sendPost);
             $scope.newPost.creating = true;
 
-            Me.sendPost({
-                post: o.p,
-                anonymous: o.a,
-                images: o.i
-            }).then(function(r) {
-                $scope.newPost.creating = false;
+            UXService.filePostModal(ev).then(function(res) {
+                //console.log(res);
+                Me.sendPost({
+                    post: o.p,
+                    anonymous: o.a,
+                    category: res,
+                    images: o.i
+                }).then(function(r) {
+                    $scope.newPost.creating = false;
+                    $scope.composer.post = "";
+                    $scope.files = [];
 
-                //console.log(r);
-                //console.log($scope.posts);
-                if (r.status === 201) {
-                    $scope.posts.unshift(r);
-                    console.log(r);
-                }
-            }, function(r) {
-                $scope.newPost.creating = false;
+                    //console.log(r);
+                    //console.log($scope.posts);
+                    if (r.status === 201) {
+                        $scope.posts.unshift(r.data);
+                        console.log(r.data);
+                    }
+                }, function(r) {
+                    $scope.newPost.creating = false;
+                });
+
             });
+
+
         };
 
         if ($scope.files.length) {
@@ -113,15 +126,14 @@ app.controller('ComposerCtrl', ['$scope', '$mdDialog', '$mdToast', 'Me', 'Upload
                     i: []
                 });
             } else {
-                v = "Alert no contenet with ux service future things";
-                alert(v);
+                UXService.alert(ev, "Post can't be empty!");
             }
 
         }
     };
 }]);
 
-app.controller('PostCtrl', ['AppService', '$scope', 'Restangular', '$mdToast', '$document', function(AppService, $scope, Restangular, $mdToast, $document) {
+app.controller('PostCtrl', ['AppService', '$scope', 'Restangular', 'UXService', '$document', function(AppService, $scope, Restangular, UXService, $document) {
     $scope.posts = []; //Post.getList();
     $scope.loading = false;
 
@@ -135,14 +147,8 @@ app.controller('PostCtrl', ['AppService', '$scope', 'Restangular', '$mdToast', '
             //console.log(r.data.plain());
         }, function(err) {
             $scope.loading = false;
-            console.log(err);
-            $mdToast.show(
-                $mdToast.simple()
-                .content('Something\'s  Wrong!')
-                .position('top left')
-                .parent($document[0].querySelector('.main'))
-                .hideDelay(3000)
-            );
+            //console.log(err);
+            UXService.toast("Something's wrong");
         });
     };
 
@@ -270,8 +276,8 @@ app.controller('LogoutCtrl', ['$scope', 'Auth', 'Me', function($scope, Auth, Me)
     console.log("mayama");
 }]);
 
-app.controller('ProfileCtrl', ['$scope', function($scope) {
-
+app.controller('ProfileCtrl', ['$scope', '$stateParams', '$state', function($scope, $stateParams, $state) {
+    console.log($stateParams.id);
 }]);
 
 app.controller('UXModalLoginCtrl', ['$scope', '$mdDialog', function($scope, $mdDialog) {
@@ -283,5 +289,17 @@ app.controller('UXModalLoginCtrl', ['$scope', '$mdDialog', function($scope, $mdD
     };
     $scope.answer = function(answer) {
         $mdDialog.hide(answer);
+    };
+}]);
+
+app.controller('UXModalPostCategorizeCtrl', ['$scope', '$mdDialog', function($scope, $mdDialog) {
+    $scope.hide = function() {
+        $mdDialog.hide();
+    };
+    $scope.cancel = function() {
+        $mdDialog.cancel();
+    };
+    $scope.filePostIn = function(id) {
+        $mdDialog.hide(id);
     };
 }]);

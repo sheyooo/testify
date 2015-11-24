@@ -4,7 +4,7 @@
         <div style="height: auto">
             <div searchbox ng-cloak></div>
             <div ng-show="user.authenticated">
-                <form name="composer" ng-submit="composePost()" ng-controller="ComposerCtrl">
+                <form name="composer" ng-submit="composePost($event)" ng-controller="ComposerCtrl">
                     <md-card style="overflow: hidden">
                         <md-toolbar layout="row" class="md-hue-2">
                             <div class="md-toolbar-tools">
@@ -14,7 +14,6 @@
                                     </div>
                                     <h2>{{ user.name }}</h2>
                                 </div>
-                                <my-icon icon="sunglasses"></my-icon>
                             </div>
                         </md-toolbar>
                         <md-card-content>

@@ -27,16 +27,22 @@
                             </md-button>
                         </md-menu-item>
                         <md-divider></md-divider>
-                        <md-menu-item ng-show="(post.user.user_id == user.user_id)">
+                        <md-menu-item ng-show="false">
                             <md-button md-no-ink ng-click="">
                                 <my-icon icon="pencil" class="text-muted"></my-icon>
                                 Edit post
                             </md-button>
                         </md-menu-item>
                         <md-menu-item ng-show="(post.user.user_id == user.user_id)">
-                            <md-button md-no-ink ng-click="">
+                            <md-button md-no-ink ng-click="deletePost()">
                                 <my-icon icon="close" class="text-muted"></my-icon>
                                 Delete post
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-item ng-show="(post.user.user_id != user.user_id)">
+                            <md-button md-no-ink ng-click="">
+                                <my-icon icon="comment-alert-outline" class="text-muted"></my-icon>
+                                Report post
                             </md-button>
                         </md-menu-item>
                     </md-menu-content>
@@ -52,9 +58,9 @@
             </div>
             <md-divider></md-divider>
             <div layout="row">
-                <p class="md-body-2 mb5 mt5 pr10 pl10">{{post.likes_count}} likes</p>
-                <p class="md-body-2 mb5 mt5 pr10">{{post.comments_count}} comments</p>
-                <p class="md-body-2 mb5 mt5 pr10">{{post.taps_count}} taps</p>
+                <p class="md-body-2 mb5 mt5 pr10 pl10">{{post.likes_count | socialCounter}} likes</p>
+                <p class="md-body-2 mb5 mt5 pr10">{{post.taps_count | socialCounter}} taps</p>
+                <p class="md-body-2 mb5 mt5 pr10">{{post.comments_count | socialCounter}} comments</p>
             </div>
             <md-divider></md-divider>
         </div>
@@ -64,6 +70,10 @@
                 </my-icon>
                 <span class="text-muted">like</span>
             </md-button>
+            <md-button class="no-m" ng-class="{'' : !post.tapped_into,'md-primary' : post.tapped_into}" ng-click="toggleTap($event)">
+                <my-icon icon="unfold-less "> </my-icon>
+                <span class="text-muted">tap into</span>
+            </md-button>
             <md-button class="no-m md-accent md-hue-2 " ng-click="openCommentBox() ">
                 <my-icon icon="comment-outline "></my-icon>
                 <span class="text-muted">comment</span>
@@ -72,10 +82,6 @@
                 <my-icon icon="share"> </my-icon>
                 share
             </md-button>
-            <md-button class="no-m" ng-class="{'md-accent md-hue-2' : !post.taped,'md-accent' : post.taped}">
-                <my-icon icon="unfold-less "> </my-icon>
-                tap into
-            </md-button>
         </div>
     </div>
 </md-card-content>
@@ -83,15 +89,12 @@
     <md-divider></md-divider>
     <md-content layout="column" layout-padding>
         <div layout="row">
-            <textarea rows="2" class="form-control pb5" placeholder="Say something..." style="resize: none; overflow: hidden"></textarea>
-            <md-button class="md-icon-button md-primary md-hue-2" aria-label="Send comment" md-no-ink>
+            <textarea rows="2" ng-model="commentBox" class="form-control pb5" placeholder="Say something..." style="resize: none; overflow: hidden"></textarea>
+            <md-button class="md-icon-button md-primary md-hue-2" aria-label="Send comment" ng-click="addComment($event)" md-no-ink>
                 <my-icon icon="send"></my-icon>
             </md-button>
         </div>
-        <div class="pt10" ng-hide="post.comments.length" layout="row" layout-align="center center" style="height: 40px;">
-            <md-progress-circular md-mode="indeterminate" md-diameter="30"></md-progress-circular>
-        </div>
-        <div class="mt20" ng-repeat="comment in post.comments">
+        <div class="mt20" ng-repeat="comment in post.comments | orderBy: '-time' track by comment.comment_id">
             <div layout="row" flex layout-fill class="">
                 <div flex="10" flex-sm="15" class="square-img-container">
                     <img class="square2 img-circle " ng-src="{{::comment.user.avatar}}">
@@ -107,6 +110,9 @@
                 </div>
             </div>
             <md-divider></md-divider>
+        </div>
+        <div class="pt10" ng-show="CommentsUI.loading" layout="row" layout-align="center center" style="height: 40px;">
+            <md-progress-circular md-mode="indeterminate" md-diameter="30"></md-progress-circular>
         </div>
         <a href="" class="mt5 mb5">Show more comments</a>
     </md-content>

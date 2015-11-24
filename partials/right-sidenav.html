@@ -1,28 +1,23 @@
 <md-sidenav layout="column" flex layout-fill class="md-sidenav-right md-whiteframe-z1" md-component-id="right" md-is-locked-open="$mdMedia('gt-lg')">
-    <md-tabs flex="100" layout-fill md-border-bottom md-autoselect md-swipe-content class="md-primary md-hue-3">
+    <md-tabs flex="100" layout-fill md-border-bottom md-autoselect class="md-primary md-hue-3">
         <md-tab label="Categories">
             <div layout="column" layout-padding>
-                <div class="right-sn-categories" ng-repeat="cat in cats" layout="row">
-                    <div flex="20" class="cat-edge" layout="row">
-                        <md-button aria-label="1.2">
-                            1.2m
+                <div class="right-sn-categories" ng-repeat="cat in categories" layout="row">
+                    <div flex="30" class="cat-edge" layout="row">
+                        <md-button aria-label="{{::cat.count}}">
+                            {{ ::cat.count | socialCounter}}
                         </md-button>
                     </div>
-                    <div flex="60" class="cat-middle" layout="row">
-                        <md-button aria-label="1.2" ng-href="{{ cat }}">
-                            {{ cat }}
-                        </md-button>
-                    </div>
-                    <div flex="20" class="cat-edge" layout="row">
-                        <md-button aria-label="1.2">
-                            <my-icon flex layout-fill icon="plus"></my-icon>
+                    <div flex=" 70 " class="cat-middle " layout="row ">
+                        <md-button aria-label=" " ng-href="posts?cat={{::cat.name}} ">
+                            {{ ::cat.name }}
                         </md-button>
                     </div>
                 </div>
             </div>
         </md-tab>
-        <md-tab label="Messages">
-            <div class="" style="padding: 25px; text-align: center;">
+        <md-tab label="Messages ">
+            <div class=" " style="padding: 25px; text-align: center; ">
                 <div>content</div>
             </div>
         </md-tab>

@@ -1,6 +1,13 @@
 app.controller('AppCtrl', function($rootScope, $scope, $mdSidenav, $mdMedia, $location, $state, $q, AppService, Auth, Me, appBase) {
     $scope.user = Auth.userProfile;
     $scope.composingPost = false;
+    $scope.tokUserId = Auth.token.user_id;
+
+    AppService.getCategories.then(function(cats) {
+        $scope.categories = cats.data;
+        //console.log(tags);
+    });
+
 
     var originatorEv;
     $scope.openMenu = function($mdOpenMenu, ev) {
@@ -19,10 +26,6 @@ app.controller('AppCtrl', function($rootScope, $scope, $mdSidenav, $mdMedia, $lo
         $state.go(state);
     };
 
-    $scope.tags = AppService.getCategories.then(function(cats) {
-        $scope.cats = cats.data;
-        //console.log(tags);
-    });
 
 
     $scope.ui = {
@@ -57,7 +60,7 @@ app.controller('AppCtrl', function($rootScope, $scope, $mdSidenav, $mdMedia, $lo
     }];
     $scope.admin = [{
         link: 'profile',
-        state: 'profile',
+        state: "user.details({user_id: tokUserId})",
         title: 'Profile',
         icon: 'account',
         action: null
@@ -68,6 +71,8 @@ app.controller('AppCtrl', function($rootScope, $scope, $mdSidenav, $mdMedia, $lo
         icon: 'settings',
         action: null
     }];
+
+    //console.log(Auth.token.user_id);
 
 
     $scope.getSearchResultIcon = function(type) {

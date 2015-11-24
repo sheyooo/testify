@@ -153,22 +153,22 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 
 		}
 
-		public static function getTrendingTags(){
+		public static function getCategories(){
 			$conn = Connection::getInstance("read");
 
-			$command = "SELECT * FROM tags";
+			$command = "SELECT * FROM categories";
 
 			$result = $conn->execObject($command);
 
 			if(mysqli_num_rows($result)){
 				$tags = null;
 				while ($row = mysqli_fetch_assoc($result)) {
-					$tags[] = $row['hashtag_form'];
+					$cats[] = new Category($row['cat_id']);
 				}
 
-				return $tags;
+				return $cats;
 			}else{
-				return false;
+				return [];
 			}
 		}
 

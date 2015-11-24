@@ -90,6 +90,12 @@ class User{
 		}
 	}
 
+	public function getActivities(){
+		$conn = Connection::getInstance("read");
+		$command = "SELECT * FROM activities WHERE user_id = $this->";
+
+	}
+
 	public function likePost($p, $type){
 		$conn = Connection::getInstance("write");
 		if($type){
@@ -106,6 +112,24 @@ class User{
 			return false;
 		}
 	}
+
+	public function tapPost($p, $type){
+		$conn = Connection::getInstance("write");
+		if($type){
+			$command = "REPLACE INTO taps (post_id, user_id)
+						VALUES({$p->getID()}, {$this->id})";
+			$result = $conn->execInsert($command);
+			return true;
+		}else{
+			$command = "DELETE FROM taps 
+						WHERE user_id = {$this->id}
+						AND post_id = {$p->getID()}";
+			$result = $conn->execDelete($command);
+
+			return false;
+		}
+	}
+
 	public function setProfilePicture($url){
 		$conn = Connection::getInstance("write");
 		$command = "UPDATE users SET avatar = '{$url}'
