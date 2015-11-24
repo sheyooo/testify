@@ -15,7 +15,7 @@ var app = angular.module('testify', ['ngMaterial',
 
 //app.constant('apiBase', "http://localhost/testify/api");
 app.constant('appUrl', "https://testify-for-testimonies.herokuapp.com");
-app.constant('appBase', "/testify");
+app.constant('appBase', "/testify/");
 app.constant('apiBase', "/testify/api");
 
 app.config(function(FacebookProvider, $httpProvider, RestangularProvider, apiBase) {
@@ -126,7 +126,7 @@ app.config(function($mdThemingProvider, $mdIconProvider) {
 app.config(function($stateProvider, $urlRouterProvider, $locationProvider, appBase) {
     $stateProvider
         .state('home', {
-            url: appBase + '/',
+            url: appBase + '',
             views: {
                 "leftNav": {
                     templateUrl: "partials/left-sidenav.html"
@@ -139,7 +139,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, appBa
                 }
             }
         }).state('login', {
-            url: appBase + '/login',
+            url: appBase + 'login',
             views: {
                 "leftNav": {},
                 "MainContent": {
@@ -148,7 +148,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, appBa
                 "rightNav": {}
             }
         }).state('signup', {
-            url: appBase + '/signup',
+            url: appBase + 'signup',
             controller: 'LoginCtrl',
             views: {
                 "leftNav": {},
@@ -158,7 +158,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, appBa
                 "rightNav": {}
             }
         }).state('logout', {
-            url: appBase + '/logout',
+            url: appBase + 'logout',
             views: {
                 "leftNav": {
                     template: " "
@@ -172,7 +172,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, appBa
                 }
             }
         }).state('entrance', {
-            url: appBase + '/entrance',
+            url: appBase + 'entrance',
             views: {
                 "leftNav": {},
                 "MainContent": {
@@ -181,7 +181,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, appBa
                 "rightNav": {}
             }
         }).state('user', {
-            url: appBase + '/user',
+            url: appBase + 'user',
             views: {
                 "leftNav": {
                     templateUrl: "partials/left-sidenav.html"
@@ -210,7 +210,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, appBa
             }
         });
 
-    $urlRouterProvider.otherwise(appBase + "/");
+    $urlRouterProvider.otherwise(appBase + "");
 
     $locationProvider.html5Mode({
         enabled: true,

@@ -1,4 +1,6 @@
-app.controller('ComposerCtrl', ['$scope', 'UXService', 'AppService', '$mdToast', 'Me', 'Upload', 'apiBase', '$timeout', '$document', '$q', function($scope, UXService, AppService, $mdToast, Me, Upload, apiBase, $timeout, $document, $q) {
+app.controller('ComposerCtrl', ['$scope', 'UXService', 'AppService', '$mdToast', 'Me', 'Upload', 'apiBase', '$timeout', '$document', '$q', function($scope, UXService, AppService, $mdToast, Me, Upload,
+    apiBase, $timeout, $document, $q) {
+
     $scope.files = [];
     $scope.newPost = {
         creating: false
@@ -119,7 +121,7 @@ app.controller('ComposerCtrl', ['$scope', 'UXService', 'AppService', '$mdToast',
                     });
                 });
         } else {
-            if ($.trim(post)) {
+            if (post = post.trim()) {
                 createPost({
                     p: post,
                     a: anonymous,

@@ -17,6 +17,8 @@ class AuthMiddleware extends \Slim\Middleware
         //The Response object
         $res = $app->response;
 
+        $res->header('Access-Control-Allow-Origin', '*');
+
         $open_access_endpoints = [
             ["method" => "GET",
                 "url" => "/\/cele/"],
@@ -115,5 +117,7 @@ class AuthMiddleware extends \Slim\Middleware
 
             //NO TOKEN PROVIDED
         }
+
+
     }
 }

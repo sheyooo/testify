@@ -204,76 +204,83 @@ $app->get('/posts', function() use ($app){
 
 	$posts = App::getPosts(15);
 
-	foreach ($posts as $post) {
+	if(is_array($posts)){
+		
+		foreach ($posts as $post) {
 
-		$post_id = $post->getID();
-		$liked = false;
-		$tapped_into = false;
-		$likes = $post->countLikes();
-		$comments = $post->countComments();
-		$taps = $post->countTaps();
-		$text = $post->getText();
-		$time = $post->getTime();
-		$cat = $post->getCategory()->getName();
-		$ijson = [];
+			$post_id = $post->getID();
+			$liked = false;
+			$tapped_into = false;
+			$likes = $post->countLikes();
+			$comments = $post->countComments();
+			$taps = $post->countTaps();
+			$text = $post->getText();
+			$time = $post->getTime();
+			$cat = $post->getCategory()->getName();
+			$ijson = [];
 
-		if (!$post->isAnonymous()) {
-			$u = $post->getAuthor();			
-			$user_id = $u->getID();
-			$avatar = $u->getProfilePictureURL();
-			$name = $u->getFullname();			 
-		}else{
-			$user_id = "anonymous"; 
-			$avatar = "img/favicon.png";
-			$name = "Anonymous Testimony";			 
+			if (!$post->isAnonymous()) {
+				$u = $post->getAuthor();			
+				$user_id = $u->getID();
+				$avatar = $u->getProfilePictureURL();
+				$name = $u->getFullname();			 
+			}else{
+				$user_id = "anonymous"; 
+				$avatar = "img/favicon.png";
+				$name = "Anonymous Testimony";			 
+			}
+
+			if($id = $app->environment()['testify.user_id']){
+				$user = new User($id);
+
+				if($post->isLiked($user)){
+					$liked = true;
+				}
+				if($post->isTappedInto($user)){
+					$tapped_into = true;
+				}
+			};
+
+			$i = $post->getImages();
+			if(count($i)){
+				foreach ($i as $img) {
+					$ijson[] = [
+							"url" => $img->getUrl(),
+							"alt" => $img->getFileName(),
+							"user_id" => $img->getUserID(),
+							"time" => $img->getTime()
+							];
+						}
+			};
+
+			$j = [
+				"post_id" => $post_id,
+				"liked" => $liked,
+				"tapped_into" => $tapped_into,			
+				"likes_count" => $likes,
+				"comments_count" => $comments,
+				"taps_count" => $taps,
+				"text" => $text,
+				"time" => $time,
+				"category" => $cat,
+				"user" => [
+					"user_id" => $user_id,
+					"avatar" => $avatar,
+					"name" => $name
+					],
+				"images" => $ijson,
+				"comments" => []
+				];
+
+			$json[] = $j;
 		}
 
-		if($id = $app->environment()['testify.user_id']){
-			$user = new User($id);
-
-			if($post->isLiked($user)){
-				$liked = true;
-			}
-			if($post->isTappedInto($user)){
-				$tapped_into = true;
-			}
-		};
-
-		$i = $post->getImages();
-		if(count($i)){
-			foreach ($i as $img) {
-				$ijson[] = [
-						"url" => $img->getUrl(),
-						"alt" => $img->getFileName(),
-						"user_id" => $img->getUserID(),
-						"time" => $img->getTime()
-						];
-					}
-		};
-
-		$j = [
-			"post_id" => $post_id,
-			"liked" => $liked,
-			"tapped_into" => $tapped_into,			
-			"likes_count" => $likes,
-			"comments_count" => $comments,
-			"taps_count" => $taps,
-			"text" => $text,
-			"time" => $time,
-			"category" => $cat,
-			"user" => [
-				"user_id" => $user_id,
-				"avatar" => $avatar,
-				"name" => $name
-				],
-			"images" => $ijson,
-			"comments" => []
-			];
-
-		$json[] = $j;
+		echo json_encode($json);
+	}else{
+		echo json_encode([]);
 	}
 
-	echo json_encode($json);
+	
 });
 
 $app->delete('/posts/:id', function($id) use ($app){
