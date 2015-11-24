@@ -1,5 +1,5 @@
 <?php 
 $___CONFIG = [
-			"BASE_URL" => "http://localhost"
+			"BASE_URL" => "https://testify-for-testimoinies.com"
 
 			];
