@@ -1,5 +1,8 @@
 {
     "dependencies": {
         "bower": ""
+    },
+    "scripts": {
+        "post_install": "bower install"
     }
 }
