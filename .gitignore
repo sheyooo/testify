@@ -7,4 +7,3 @@ testify.sublime-workspace
 npm-debug.log
 /server/lib/vendor
 /img/profiles
-/img/imgix_source/*

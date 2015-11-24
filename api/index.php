@@ -205,7 +205,7 @@ $app->get('/posts', function() use ($app){
 	$posts = App::getPosts(15);
 
 	if(is_array($posts)){
-		
+
 		foreach ($posts as $post) {
 
 			$post_id = $post->getID();
@@ -405,7 +405,7 @@ $app->post('/images', function() use ($app, $___CONFIG){
 	$filename = $_FILES['file']['name'];
 	  //$tags = $_POST['tags'];  // $tags = array('dark', 'moon');
 	  $destination = __DIR__ . '/../img/imgix_source/' . $filename;
-	  if(move_uploaded_file( $_FILES['file']['tmp_name'] , $destination ) && $_FILES['file']['size'] <= 2000000){
+	  if(move_uploaded_file( $_FILES['file']['tmp_name'] , $destination )){
 	  	$r = ["file_name" => $filename,
 	  			"url" => $___CONFIG['BASE_URL'] . '/img/imgix_source/' . $filename,
 	  			"user_id" => $app->environment['testify.user_id']
