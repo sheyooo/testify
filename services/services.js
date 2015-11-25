@@ -137,25 +137,39 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', 'F
         //console.log("loginctrl");
         var d = $q.defer();
 
-        Facebook.login(function(r) {
-            //console.log(r);
-            if (r.status === 'connected') {
+        Facebook.getLoginStatus(function(r) {
+            if (r.status == 'connected') {
+                //console.log("hh");
                 json = {
                     "fb_access_token": r.authResponse.accessToken
                 };
                 Restangular.service('fb-token').post(json).then(function(r) {
-                    //console.log(r);
                     saveToken(r.data.token);
                     refreshProfile(); //Refresh session data here
-                    //$scope.refreshProfile();
-                    //$state.go('home');
                     d.resolve(r.data.token);
+
                 }, function(r) {
                     d.reject(r);
                 });
             } else {
-                d.reject(false);
-                return "Login failed";
+                Facebook.login(function(r) {
+                    //console.log(r);
+                    if (r.status === 'connected') {
+                        json = {
+                            "fb_access_token": r.authResponse.accessToken
+                        };
+                        Restangular.service('fb-token').post(json).then(function(r) {
+                            saveToken(r.data.token);
+                            refreshProfile(); //Refresh session data here
+                            d.resolve(r.data.token);
+                        }, function(r) {
+                            d.reject(r);
+                        });
+                    } else {
+                        d.reject(false);
+                        return "Login failed";
+                    }
+                });
             }
         });
 

@@ -99,7 +99,7 @@ app.controller('ComposerCtrl', ['$scope', 'UXService', 'AppService', '$mdToast',
                     //console.log($scope.posts);
                     if (r.status === 201) {
                         $scope.posts.unshift(r.data);
-                        console.log(r.data);
+                        //console.log(r.data);
                     }
                 }, function(r) {
                     $scope.newPost.creating = false;
