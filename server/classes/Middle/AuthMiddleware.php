@@ -18,6 +18,15 @@ class AuthMiddleware extends \Slim\Middleware
         $res = $app->response;
 
         $res->header('Access-Control-Allow-Origin', '*');
+        $res->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+        $res->header('Access-Control-Allow-Headers', 'X-MY-CUSTOM HEADER');
+        $res->header('Access-Control-Allow-Credentials', 'true');
+
+        if($req->isOptions()){
+
+        }
+        
+
 
         $open_access_endpoints = [
             ["method" => "GET",
@@ -105,6 +114,8 @@ class AuthMiddleware extends \Slim\Middleware
                 //echo "yepss";
                 $this->next->call();
 
+            }elseif($app->request->isOptions()){
+                $app->response->status(200);
             }else{
                 //$this->next->call();
                 $r = array("status" => "Unauthorized");
