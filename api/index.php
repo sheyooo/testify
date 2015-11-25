@@ -168,7 +168,7 @@ $app->post('/users/:id/posts', function($id) use ($app){
 		}else{
 			$user = [
 			"user_id" => null,
-			"avatar" => "img/lgog.png",
+			"avatar" => "img/favicon.png",
 			"name" => "Anonymous"];
 		}
 		$ijson = [];
