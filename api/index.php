@@ -373,7 +373,7 @@ $app->get('/posts/:id/comments', function($id) use ($app){
 
 		echo json_encode($json);
 
-		sleep(1);
+		//sleep(1);
 	}
 });
 
