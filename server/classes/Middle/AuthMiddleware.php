@@ -19,12 +19,14 @@ class AuthMiddleware extends \Slim\Middleware
 
         $res->header('Access-Control-Allow-Origin', '*');
         $res->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-        $res->header('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+        $res->header('Access-Control-Allow-Headers', $req->headers('Access-Control-Request-Headers'));
         $res->header('Access-Control-Allow-Credentials', 'true');
 
-        if($req->isOptions()){
+        //echo $req->headers('Content-Type');
 
-        }
+        /*if($req->isOptions()){
+
+        }*/
         
 
 
