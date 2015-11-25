@@ -400,26 +400,47 @@ $app->post('/posts/:id/comments', function($id) use ($app){
 	}
 });
 
-$app->post('/images', function() use ($app, $___CONFIG){
-	error_reporting(E_ALL);
-	$filename = $_FILES['file']['name'];
-	  //$tags = $_POST['tags'];  // $tags = array('dark', 'moon');
-	  $destination = __DIR__ . '/../img/imgix_source/' . $filename;
-	  if(move_uploaded_file( $_FILES['file']['tmp_name'] , $destination )){
-	  	$r = ["file_name" => $filename,
-	  			"url" => $___CONFIG['BASE_URL'] . '/img/imgix_source/' . $filename,
-	  			"user_id" => $app->environment['testify.user_id']
+$app->post('/images', function() use ($app){
+	$client = Aws\S3\S3Client::factory([
+		'region' => 'us-west-2',
+		'version' => '2006-03-01',
+		'http' => ['verify' => false]
+			]
+		);
+	$bucket = getenv('S3_BUCKET')?: die('No "S3_BUCKET" config var in found in env!');
+	
+	$user_id = $app->environment()['testify.user_id'];
+
+	if(isset($_FILES['file']) && $_FILES['file']['error'] == UPLOAD_ERR_OK && is_uploaded_file($_FILES['file']['tmp_name']) && $_FILES['file']['size'] < 3000000) {
+		
+	    // FIXME: add more validation, e.g. using ext/fileinfo
+	    try {
+	        $key = $user_id . time() . $_FILES['file']['name'];
+	        $result = $client->putObject(array(
+			    'Bucket'     => $bucket,
+			    'Key'        => 'posts/' . $key,
+			    'SourceFile' => $_FILES['file']['tmp_name']
+			));
+
+			$r = ["file_name" => $key,
+	  			"url" => "https://testify.imgix.net/" . $key,
+	  			"user_id" => $user_id
 	  			];
 
-	  	$id = Image::addTemp($r);
-	  	echo json_encode(["status" => true,
+		  	$id = Image::addTemp($r);
+		  	if($r){
+		  		$app->response->status(201);
+		  		echo json_encode(["status" => true,
 	  						"image_id" => $id]);
-	  }else{
-	  	//echo $_FILES['file']['error'];
-	  	//echo $_FILES['file']['tmp_name'];
+		  	}else{
+		  		echo json_encode(["status" => false]);
+		  	}	        
 
-	  	echo json_encode(["status" => false]);
-	  } 
+		 } catch(Exception $e) {
+		 		//echo $e;
+		 		echo json_encode(["status" => false]);
+		 } 
+	}
 });
 
 $app->get('/cele', function() use ($app){
