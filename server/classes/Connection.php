@@ -22,6 +22,7 @@ class Connection{
 			$db = substr($url["path"], 1);
 
 			$conn = new mysqli($server, $username, $password, $db);
+			mysqli_query($conn , "SET time_zone = '+01:00' ")or die("SET TIMEZONE FAILED");
 			self::$conn = $conn;
 			
 		}else{
