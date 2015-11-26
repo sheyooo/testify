@@ -20,10 +20,18 @@ app.directive('rightSidenav', [function() {
 app.directive('searchbox', [function() {
     return {
         restrict: 'A',
-        templateUrl: 'partials/searchbox.html',
-        link: function(scope, iElement, iAttrs) {
+        transclude: true,
+        replace: true,
+        templateUrl: 'partials/searchbox.html'
+    };
+}]);
 
-        }
+app.directive('appToolbar', [function() {
+    return {
+        restrict: 'A',
+        transclude: true,
+        replace: true,
+        templateUrl: 'partials/app-toolbar.html'
     };
 }]);
 

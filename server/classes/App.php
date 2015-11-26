@@ -205,6 +205,7 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 		}
 
 		public static function generateToken($uid){
+			$u = new User($uid);
 
 			$signer = new Sha256();
 
@@ -214,7 +215,8 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 			                        ->setIssuedAt(time()) // Configures the time that the token was issue (iat claim)
 			                        //->setNotBefore(time() + 60) // Configures the time that the token can be used (nbf claim)
 			                        ->setExpiration(time() + (60 * 60 * 24 * 7)) // Configures the expiration time of the token (exp claim)
-			                        ->set('user_id', $uid) // Configures a new claim, called "uid"
+			                        ->set('user_id', $uid)
+			                        ->set('hash_id', $u->getHashID())
 			                        ->sign($signer, 'sheyi') // creates a signature using "testing" as key
 			                        ->getToken(); // Retrieves the generated token
 

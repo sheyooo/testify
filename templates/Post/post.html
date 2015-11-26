@@ -5,7 +5,7 @@
                 <img class="img-circle square2" ng-src="{{::post.user.avatar}}">
             </div>
             <div flex layout="column" class="ml15">
-                <span class="md-body-1"><a href="">{{::post.user.name}}</a></span>
+                <span class="md-body-1"><a ui-sref="user({hash_id: post.user.hash_id})">{{::post.user.name}}</a></span>
                 <span class="md-caption mb10"><time am-time-ago="post.time"></time> </span>
             </div>
             <div flex="10" layout="row" layout-align="end start">

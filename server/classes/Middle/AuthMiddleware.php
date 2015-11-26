@@ -60,7 +60,7 @@ class AuthMiddleware extends \Slim\Middleware
                 'url' => "/\/posts\/[0-9]+\/comments/"),
             array(
                 'method' => 'GET',
-                'url' => "/\/users\/[0-9]+\z/"),
+                'url' => "/\/users\/[0-9a-zA-Z]+\z/"),
             ];
 
         $bearer_token = $app->request->headers->get('Authorization');

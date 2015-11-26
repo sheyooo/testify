@@ -97,20 +97,20 @@ $app->post('/users/', function () use ($app) {
 	}    
 });
 
-$app->get('/users/:id/', function($id) use ($app){
-	$u = new User($id);
-	
-	if($u->getID()){
+$app->get('/users/:hash_id/', function($hash_id) use ($app){
+	try{
+		$u = new User(Tools::decodeHashID("user", $hash_id));
 		echo json_encode([
 			"user_id" => $u->getID(),
+			"hash_id" => $u->getHashID(),
 			"first_name" => $u->getFirstName(),
 			"last_name" => $u->getLastName(),
 			"email" => $u->getEmail(),
 			"avatar" => $u->getProfilePictureURL()]);
-	}else{
+	}catch(Exception $e){
 		$app->response->status(404);
 		echo json_encode(["status" => "User not found"]);
-	}
+	};
 });
 
 $app->get('/users/:id/posts', function($id) use ($app){
@@ -220,12 +220,23 @@ $app->get('/posts', function() use ($app){
 			$ijson = [];
 
 			if (!$post->isAnonymous()) {
-				$u = $post->getAuthor();			
-				$user_id = $u->getID();
-				$avatar = $u->getProfilePictureURL();
-				$name = $u->getFullname();			 
+				try{
+					$u = $post->getAuthor();			
+					$user_id = $u->getID();
+					$hash_id = $u->getHashID();
+					$avatar = $u->getProfilePictureURL();
+					$name = $u->getFullname();	
+				}catch(Exception $e){
+					$user_id = "anonymous";
+					$hash_id = "anonymous";
+					$avatar = "img/favicon.png";
+					$name = "Anonymous Testimony";	
+
+				}
+						 
 			}else{
-				$user_id = "anonymous"; 
+				$user_id = "anonymous";
+				$hash_id = "anonymous";
 				$avatar = "img/favicon.png";
 				$name = "Anonymous Testimony";			 
 			}
@@ -265,6 +276,7 @@ $app->get('/posts', function() use ($app){
 				"category" => $cat,
 				"user" => [
 					"user_id" => $user_id,
+					"hash_id" => $hash_id,
 					"avatar" => $avatar,
 					"name" => $name
 					],
@@ -445,59 +457,10 @@ $app->post('/images', function() use ($app){
 
 $app->get('/cele', function() use ($app){
 
-	$xml = "<?xml version=\'1.0\' encoding=\'utf-8\'?>
-	<Categories>
-
-	<Category strNum=\'1\' endNum=\'1\'>PROCESSIONAL HYMN</Category>
-	<Category strNum=\'2\' endNum=\'2\'>LIGHTNING THE CANDLES</Category>
-	<Category strNum=\'3\' endNum=\'4\'>KNEELING DOWN</Category>
-	<Category strNum=\'5\' endNum=\'50\'>FORGIVENESS AND REPENTANCE</Category>
-	<Category strNum=\'51\' endNum=\'125\'>SERVICES</Category>
-	<Category strNum=\'126\' endNum=\'150\'>SONGS FOR PALM SUNDAY</Category>
-	<Category strNum=\'151\' endNum=\'175\'>MERCY AND DURING PASSION WEEK</Category>
-	<Category strNum=\'176\' endNum=\'200\'>EASTER DAY</Category>
-	<Category strNum=\'201\' endNum=\'225\'>GOD\'S GLORY AND ASCENSION DAY</Category>
-	<Category strNum=\'226\' endNum=\'250\'>HOLY SPIRIT</Category>
-	<Category strNum=\'251\' endNum=\'275\'>SPIRITUAL POWER</Category>
-	<Category strNum=\'276\' endNum=\'300\'>GOOD NEWS</Category>
-	<Category strNum=\'301\' endNum=\'325\'>PRAISE</Category>
-	<Category strNum=\'326\' endNum=\'350\'>GLORY</Category>
-	<Category strNum=\'351\' endNum=\'375\'>JOY</Category>
-	<Category strNum=\'376\' endNum=\'400\'>THANKSGIVING</Category>
-	<Category strNum=\'401\' endNum=\'425\'>BLESSING</Category>
-	<Category strNum=\'426\' endNum=\'450\'>HARVEST</Category>
-	<Category strNum=\'451\' endNum=\'485\'>VICTORY</Category>
-	<Category strNum=\'486\' endNum=\'500\'>HEALING</Category>
-	<Category strNum=\'501\' endNum=\'520\'>BAPTISM</Category>
-	<Category strNum=\'521\' endNum=\'550\'>FAITH</Category>
-	<Category strNum=\'551\' endNum=\'570\'>JUDGEMENT</Category>
-	<Category strNum=\'571\' endNum=\'600\'>THE COMING OF CHRIST</Category>
-	<Category strNum=\'601\' endNum=\'630\'>GOD\'S WORK</Category>
-	<Category strNum=\'631\' endNum=\'645\'>WARNING</Category>
-	<Category strNum=\'646\' endNum=\'665\'>BURIAL AND REMEMBRANCE</Category>
-	<Category strNum=\'666\' endNum=\'675\'>CALL TO HEAVEN</Category>
-	<Category strNum=\'676\' endNum=\'690\'>DIVINE CALL</Category>
-	<Category strNum=\'691\' endNum=\'700\'>HEAVENLY CALL</Category>
-	<Category strNum=\'701\' endNum=\'725\'>REVELATION</Category>
-	<Category strNum=\'726\' endNum=\'730\'>SANCTIFICATION</Category>
-	<Category strNum=\'731\' endNum=\'735\'>HOUSE OPENING</Category>
-	<Category strNum=\'736\' endNum=\'760\'>DIVINE LOVE</Category>
-	<Category strNum=\'761\' endNum=\'770\'>HOLY RE-UNION</Category>
-	<Category strNum=\'771\' endNum=\'780\'>HOLY COMMUNICATION</Category>
-	<Category strNum=\'781\' endNum=\'790\'>WEDDING</Category>
-	<Category strNum=\'791\' endNum=\'800\'>PRAYERS</Category>
-	<Category strNum=\'801\' endNum=\'825\'>PROTECTION AND JOURNEY</Category>
-	<Category strNum=\'826\' endNum=\'850\'>CHILDREN</Category>
-	<Category strNum=\'851\' endNum=\'875\'>BIRTH OF CHRIST</Category>
-	<Category strNum=\'876\' endNum=\'900\'>SEEKING FAVOUR FROM GOD</Category>
-	<Category strNum=\'901\' endNum=\'906\'>PROMISE</Category>
-	<Category strNum=\'907\' endNum=\'978\'>PRAISE AND WORSHIP</Category>
+	$xml = "";
 
 
-	</Categories>";
-
-
-	function Parse ($url) {
+	/*function Parse ($url) {
 	        $fileContents= $url;
 	        $fileContents = str_replace(array("\n", "\r", "\t"), '', $fileContents);
 	        $fileContents = trim(str_replace('"', "'", $fileContents));
@@ -505,15 +468,15 @@ $app->get('/cele', function() use ($app){
 	        $json = json_encode($simpleXml);
 
 	        return $json;
-	    }
+	    }*/
 
 
 
-	$o = json_decode(Parse($xml));
+	/*$o = json_decode(Parse($xml));
 
-	print_r($o);
+	print_r($o);*/
 
-	foreach ($o as $hymns) {
+	/*foreach ($o as $hymns) {
 		$json;
 		foreach ($hymns as $hymn) {
 			//print_r($hymns);
@@ -527,13 +490,13 @@ $app->get('/cele', function() use ($app){
 			//$title = $hymn->Title;
 			$cat = $hymn->Category;
 			//$verses = [];
-			/*if(is_array($hymn->Verse)){
+			if(is_array($hymn->Verse)){
 				foreach ($hymn->Verse as $v) {
 					$verses[] = $v;
 				}
 			}else{
 				$verses[] = $hymn->Verse;
-			}*/
+			}
 
 			$myStructure = ["category" => $cat,
 							"start" => $start,
@@ -549,8 +512,9 @@ $app->get('/cele', function() use ($app){
 		}
 
 		//echo json_encode($json);
-	}
+	}*/
 
+	echo Tools::generateHashID("user",13);
 });
 
 

@@ -278,8 +278,9 @@ app.controller('LogoutCtrl', ['$scope', 'Auth', 'Me', function($scope, Auth, Me)
     console.log("mayama");
 }]);
 
-app.controller('ProfileCtrl', ['$scope', '$stateParams', '$state', function($scope, $stateParams, $state) {
-    console.log($stateParams.id);
+app.controller('ProfileCtrl', ['profile', '$scope', '$stateParams', '$state', function(profile, $scope, $stateParams, $state) {
+    $scope.profile = profile.data;
+    //console.log(profile);
 }]);
 
 app.controller('UXModalLoginCtrl', ['$scope', '$mdDialog', function($scope, $mdDialog) {

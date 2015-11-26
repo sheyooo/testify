@@ -1,6 +1,7 @@
 <?php
 class User{
 	private $id;
+	private $hash_id;
 	private $school_id;
 	private $title;
 	protected $first_name;
@@ -25,6 +26,7 @@ class User{
 			unset($row['password']);		
 			$this->initialized = true;
 			$this->id = $row['user_id'];
+			$this->hash_id = $row['hash_id'];
 			$this->first_name = $row['first_name'];
 			$this->last_name = $row['last_name'];
 			$this->avatar = $row['avatar'];
@@ -32,19 +34,23 @@ class User{
 			$this->sex = $row['sex'];
 			$this->fields_from_db = $row;
 		} else{
-			return false;
+			throw new Exception("Invalid id not found in the database");
 		};
 	}
-	public function getFields(){
-		if($this->fields_from_db){
-			return $this->fields_from_db;
-		} else{
-			return false;
-		};
+	public function getFields($r){
+		
+		if(is_array($r)){
+			//Implement here getting specific fields from the db through an array parameter and throw Exceptions if such fields dont exist from $fields_from_db
+		}
 	}
 	public function getID(){
 
 		return $this->id;
+	}
+
+	public function getHashID(){
+
+		return $this->hash_id;
 	}
 	public function getFullname(){
 		$t = $this->type;
@@ -327,10 +333,15 @@ class User{
 		$values = implode(",", $values);	
 
 
-		$command = "INSERT INTO users ({$columns}) VALUES({$values})";
-		$result = $conn->execInsert($command);
-		if($result){
-			return $result;
+		$command = "REPLACE INTO users ({$columns}) VALUES({$values})";
+		$id = $conn->execInsert($command);
+		if($id){
+			$hash_id = Tools::generateHashID('user', $id);
+			$command = "UPDATE users 
+						SET hash_id = '{$hash_id}'
+						WHERE user_id = {$id}";
+			$conn->execUpdate($command);
+			return $id;
 		}else{
 			return false;
 		}

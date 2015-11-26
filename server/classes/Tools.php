@@ -3,56 +3,6 @@
 
 class Tools {
 
-	public static function signin($username, $password){
-		$conn = Connection::getInstance("read");
-
-        $command = "SELECT user_id, first_name, last_name, username, password, school_id
-                        FROM users
-                        WHERE username = '{$username}'
-                        OR email = '{$username}' ";
-
-        $result = $conn->execObject($command);
-
-        if (mysqli_num_rows($result)) {
-            $row = mysqli_fetch_array($result);
-
-            if( password_verify($password, $row['password'] )){
-            	$_SESSION['signed_in'] = 1;
-                $_SESSION['subdomain'] = $subdomain;
-                $_SESSION['school_id'] = $row['school_id'];
-                $_SESSION['id'] = $row['user_id'];
-                $_SESSION['type'] = $row['type'];
-                
-                return true;
-            }else{
-            	return false;
-            }
-        }
-	    
-	}
-
-	public static function getSubdomain($url){
-		
-	    //$url = 'http://www.mysite.com/';
-	    $url = parse_url($url,PHP_URL_HOST);
-	    $url = strstr(str_replace("www.","",$url), ".",true);
-	    var_dump($url);
-	    if($url == "gradeaccess"){
-	    	return false;
-	    }elseif($url == ""){
-	    	return false;
-	    }else{
-	    	return($url);
-	    }
-	    
-		
-	}
-
-	public static function getCurrentDateAttendance(){
-		//echo date("Y-m-d");
-		return date("Y-m-d");
-	}
-
 
 	public static function cleanString($string){
 	
@@ -93,30 +43,24 @@ class Tools {
 		}
 	}
 
-	public static function isUserLogged(){
+	public static function generateHashID($salt, $id){
+		$hashids = new Hashids\Hashids($salt, 10);
+		$id = $hashids->encode($id);
+		//$numbers = $hashids->decode($id);
+		//echo $id;
+		return $id;
+	}
 
-		if (isset($_SESSION['signed_in'])) {
-			if ($_SESSION['signed_in']){
-				return Tools::cleanString($_SESSION['id']);
-			}else{
-				return false;
-			}
-			
-			//return true;
+	public static function decodeHashID($salt, $hash_id){
+		$hashids = new Hashids\Hashids($salt, 10);
+		$number = $hashids->decode($hash_id);
+		//print_r($number);
+		if(isset($number[0])){
+			return $number[0];
 		}else{
-			return false;
-		};
+			throw new Exception("Unable to decode hash_id");
+		}
 	}
-
-	public static function redirect($url){
-
-		header("Location: {$url}");
-	}
-
-
-
-	
-
 
 
 

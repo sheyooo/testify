@@ -1,7 +1,8 @@
 app.controller('AppCtrl', function($rootScope, $scope, $mdSidenav, $mdMedia, $location, $state, $q, AppService, Auth, Me, appBase) {
     $scope.user = Auth.userProfile;
     $scope.composingPost = false;
-    $scope.tokUserId = Auth.token.user_id;
+    $scope.tokHashId = Auth.token.hash_id;
+    //console.log($scope.tokHashId);
 
     AppService.getCategories.then(function(cats) {
         $scope.categories = cats.data;
@@ -60,7 +61,7 @@ app.controller('AppCtrl', function($rootScope, $scope, $mdSidenav, $mdMedia, $lo
     }];
     $scope.admin = [{
         link: 'profile',
-        state: "user.details({user_id: tokUserId})",
+        state: "user({hash_id: tokHashId})",
         title: 'Profile',
         icon: 'account',
         action: null

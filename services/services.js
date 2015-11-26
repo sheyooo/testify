@@ -25,6 +25,7 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', 'F
     var user = {
         authenticated: false,
         user_id: null,
+        hash_id: null,
         name: "Guest",
         firstName: "Guest",
         lastName: "Guest",
@@ -69,11 +70,11 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', 'F
     var refreshProfile = function() {
         //console.log("refresh")
         var d = $q.defer();
-        if (getClaimsFromToken().user_id) {
+        if (getClaimsFromToken().hash_id) {
             //console.log("truthy");
             //console.log(getClaimsFromToken().user_id);
 
-            Restangular.one('users', getClaimsFromToken().user_id).get().then(function(r) {
+            Restangular.one('users', getClaimsFromToken().hash_id).get().then(function(r) {
                 buildAuthProfile(r.data);
                 d.resolve(true);
                 //console.log(getClaimsFromToken().user_id);
@@ -96,6 +97,7 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', 'F
         //console.log(user, u);
         user.authenticated = true;
         user.user_id = u.user_id;
+        user.hash_id = u.hash_id;
         user.name = u.first_name + ' ' + u.last_name;
         user.firstName = u.first_name;
         user.lastName = u.last_name;
@@ -186,6 +188,7 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', 'F
     var resetProfile = function() {
         user.authenticated = false;
         user.user_id = null;
+        user.hash_id = null;
         user.name = "Guest";
         user.firstName = "Guest";
         user.lastName = "Guest";

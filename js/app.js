@@ -16,7 +16,7 @@ var app = angular.module('testify', ['ngMaterial',
 //app.constant('apiBase', "http://localhost/testify/api");
 app.constant('appUrl', "https://testify-for-testimonies.herokuapp.com");
 app.constant('appBase', "/");
-app.constant('apiBase', "https://testify-for-testimonies.herokuapp.com/api");
+app.constant('apiBase', "http://localhost/testify/api");
 
 app.config(function(FacebookProvider, $httpProvider, RestangularProvider, apiBase) {
     FacebookProvider.setAppId(180042792329807);
@@ -181,27 +181,19 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, appBa
                 "rightNav": {}
             }
         }).state('user', {
-            url: appBase + 'user',
+            url: '/user/:hash_id',
             views: {
                 "leftNav": {
                     templateUrl: "partials/left-sidenav.html"
                 },
                 "MainContent": {
-                    templateUrl: "views/profile.html"
-                },
-                "rightNav": {
-                    templateUrl: "partials/right-sidenav.html"
-
-                }
-            }
-        }).state('user.details', {
-            url: '/:user_id',
-            views: {
-                "leftNav": {
-                    templateUrl: "partials/left-sidenav.html"
-                },
-                "MainContent": {
-                    templateUrl: "views/profile.html"
+                    templateUrl: "views/profile.html",
+                    controller: 'ProfileCtrl',
+                    resolve: {
+                        profile: function($stateParams, Restangular) {
+                            return Restangular.one('users', $stateParams.hash_id).get();
+                        }
+                    },
                 },
                 "rightNav": {
                     templateUrl: "partials/right-sidenav.html"

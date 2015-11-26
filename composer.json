@@ -12,7 +12,8 @@
         "imgix/imgix-php": "^1.0",
         "facebook/php-sdk-v4": "~5.0",
         "lcobucci/jwt": "^3.1",
-        "aws/aws-sdk-php": "^3.11"
+        "aws/aws-sdk-php": "^3.11",
+        "hashids/hashids": "^1.0"
     },
     "require-dev": {},
     "authors": [{

@@ -241,6 +241,7 @@ img {
 .btn-parent.flat {
     position: absolute;
     left: 0px;
+    right: 0px;
     top: 0px;
     margin: 0 auto;
     height: 100%;
@@ -253,5 +254,18 @@ img {
     }
     &:hover {
         background: #819CAD;
+    }
+}
+
+.sidenav-items {
+    padding: 0px;
+    & .mdi {
+        margin: 10px;
+        color: #5DADE0;
+    }
+    & .sidenav-item .md-button {
+        display: block;
+        border-radius: 0;
+        margin: 10px 0px;
     }
 }
