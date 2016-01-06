@@ -26,7 +26,6 @@ body {
     font-family: Open sans, 'Helvetica Neue', sans-serif !important;
     line-height: 25px;
     height: 100%;
-    padding-top: 64px;
 }
 
 p,
@@ -40,6 +39,10 @@ p,
     top: 6px;
 }
 
+.main-layout.dashboard {
+    padding-top: 56px;
+}
+
 
 /* @media only screen and (max-height: 500px) {
     body {
@@ -47,14 +50,26 @@ p,
     }
 } */
 
-@media only screen and (max-width: 600px) {
-    body {
-        padding-top: 56px;
+@media only screen and(orientation: landscape) and(max-height: 667px) {
+    .main-layout.dashboard {
+        padding-top: 64px;
     }
 }
 
-@media only screen and (max-width: 600px) and (max-height: 600px) {
-    body {
+@media only screen and(orientation: landscape) and (max-height: 667px) and (max-width: 959px) {
+    .main-layout.dashboard {
+        padding-top: 64px;
+    }
+}
+
+@media only screen and(orientation: landscape) and (min-height: 667px) and (min-width: 959px) {
+    .main-layout.dashboard {
+        padding-top: 64px;
+    }
+}
+
+@media only screen and(orientation: landscape) and (max-width: 959px) {
+    .main-layout.dashboard {
         padding-top: 48px;
     }
 }
@@ -74,6 +89,10 @@ p,
     height: auto !important;
 }
 
+.no-bg {
+    background: none !important;
+}
+
 .entrance-bg {
     background: url('../img/1.jpg');
     background-size: cover;
@@ -81,7 +100,7 @@ p,
 }
 
 .login-bg {
-    background: transparent url("../img/worship1.jpg") repeat fixed 0% 100% /cover;
+    background: url("../img/concert.jpg") no-repeat fixed 0% 0% /cover;
 }
 
 // Angular
@@ -217,21 +236,28 @@ img {
 /* custom categories element styling */
 
 .right-sn-categories {
-    background: #EE8277;
+    background: #97B6CA;
     color: #fff;
     height: 40px;
     //display: block;
     margin: 5px;
+    & a {
+        //color: #fff;
+        display: inline-block;
+    }
+    & .cat-edge a {
+        color: #fff;
+    }
     & .md-button {
         margin: 0px;
         width: 100%;
     }
     & .cat-middle {
-        background-color: #D3746B;
-    }
-    & a {
-        color: #fff;
-        display: inline-block;
+        background-color: #fff;
+        border: solid #73BCED 1px;
+        & a {
+            color: #777;
+        }
     }
 }
 
@@ -268,4 +294,8 @@ img {
         border-radius: 0;
         margin: 10px 0px;
     }
+}
+
+.md-button.btn-border {
+    border: solid 1px;
 }

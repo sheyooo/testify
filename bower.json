@@ -28,6 +28,11 @@
     "angular-moment": "~0.10.3",
     "angular-ui-router": "~0.2.15",
     "restangular": "~1.5.1",
-    "angular-facebook": "~0.2.3"
+    "angular-facebook": "~0.2.3",
+    "angular-emoji-popup": "~1.1.0"
+  },
+  "resolutions": {
+    "angular": "^1.4.8",
+    "angular-material": "1.0.1"
   }
 }

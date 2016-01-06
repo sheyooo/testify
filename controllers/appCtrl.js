@@ -1,12 +1,28 @@
 app.controller('AppCtrl', function($rootScope, $scope, $mdSidenav, $mdMedia, $location, $state, $q, AppService, Auth, Me, appBase) {
+    $scope.location = $location;
     $scope.user = Auth.userProfile;
     $scope.composingPost = false;
     $scope.tokHashId = Auth.token.hash_id;
+    //$state.go('web.app.login');
+
+    $scope.ui = {
+        showSearch: false,
+        showSideNav: $state,
+        toggleNav: function(which) {
+            $mdSidenav(which).toggle();
+            //console.log(which);
+        },
+        toggleSearchBox: function() {
+            $scope.ui.showSearch = !$scope.ui.showSearch;
+        }
+    };
+    //console.log($state);
+    //$scope.ui.showSideNav = $state.current.data.showSideNav;
     //console.log($scope.tokHashId);
 
     AppService.getCategories.then(function(cats) {
+
         $scope.categories = cats.data;
-        //console.log(tags);
     });
 
 
@@ -27,53 +43,47 @@ app.controller('AppCtrl', function($rootScope, $scope, $mdSidenav, $mdMedia, $lo
         $state.go(state);
     };
 
-
-
-    $scope.ui = {
-        showSearch: false,
-        toggleNav: function(which) {
-            $mdSidenav(which).toggle();
-            //console.log(which);
-        },
-        toggleSearchBox: function() {
-            $scope.ui.showSearch = !$scope.ui.showSearch;
-        }
-    };
-
     $scope.menu = [{
         link: '',
-        state: 'home',
+        state: 'web.app.dashboard.home',
         title: 'Feeds',
-        icon: 'message-text',
-        click: ''
-    }, {
-        link: 'entrance',
-        state: 'entrance',
-        title: 'Friends',
-        icon: 'account-multiple',
-        click: ''
-    }, {
-        link: '',
-        state: 'home',
-        title: 'Messages',
-        icon: 'message-text-outline',
+        icon: 'home',
+        condition: true,
         click: ''
     }];
-    $scope.admin = [{
+
+    $scope.menuAuth = [{
         link: 'profile',
-        state: "user({hash_id: tokHashId})",
+        state: "web.app.dashboard.user({hash_id: tokHashId})",
         title: 'Profile',
         icon: 'account',
+        condition: 'user.authenticated',
+        action: null
+    }, {
+        link: '',
+        state: 'web.app.dashboard.home',
+        title: 'Messages',
+        icon: 'message-text-outline',
+        condition: 'user.authenticated',
+        click: ''
+    }, {
+        link: 'showListBottomSheet($event)',
+        state: 'web.app.dashboard.user.favorites({hash_id: tokHashId})',
+        title: 'Favourites',
+        icon: 'star',
+        condition: 'user.authenticated',
         action: null
     }, {
         link: 'showListBottomSheet($event)',
-        state: 'settings',
+        state: 'web.app.dashboard.settings',
         title: 'Settings',
         icon: 'settings',
+        condition: 'user.authenticated',
         action: null
     }];
 
-    //console.log(Auth.token.user_id);
+
+
 
 
     $scope.getSearchResultIcon = function(type) {

@@ -1,35 +1,35 @@
 <md-toolbar class="app-header md-primary md-whiteframe-z1" layout="row">
     <div class="md-toolbar-tools" layout="row">
-        <div layout="row" flex="30" flex-md="40" flex-sm="15">
+        <div layout="row" flex="30" flex-sm="40" flex-xs="15">
             <div flex layout="row" layout-align="start center">
-                <md-button class="md-icon-button no-m" aria-label="Settings" ng-click="ui.toggleNav('left')" hide-gt-md ng-show="!ui.showSideNav">
-                    <my-icon icon="menu">
+                <md-button class="md-icon-button no-m" aria-label="Settings" ng-click="ui.toggleNav('left')" hide-gt-md>
+                    <my-icon icon="menu" style="line-height: 0px">
                     </my-icon>
                 </md-button>
-                <div style="height: 35px; width: 30px" layout="column" class="mr10" hide-sm>
-                    <img class="" layout-fill src="img/small-logo.png" alt="">
+                <div style="height: 35px; width: 30px" layout="column" class="mr10" hide show-gt-xs>
+                    <a ui-sref="web.app.dashboard.home"><img class="" layout-fill src="img/small-logo.png" alt=""></a>
                 </div>
-                <div hide-sm layout="column">
-                    <a href="/testify"><h2>Testify</h2></a>
-                    <span hide-sm hide-md class="md-subhead"><i>sharing God's goodness</i></span>
+                <div hide show-gt-sm layout="column">
+                    <a ui-sref="web.app.dashboard.home"><h2>Testify</h2></a>
+                    <span show-gt-md class="md-subhead">sharing God's goodness</span>
                 </div>
             </div>
         </div>
-        <div style="height: 100%" layout="row" flex="70" flex-md="60" flex-sm="85">
-            <span flex="15" flex-md="0" flex-sm="0"></span>
-            <div layout="row" flex="35" flex-md="60" flex-sm="60">
+        <div style="height: 100%" layout="row" flex="70" flex-sm="60" flex-xs="85">
+            <span flex-gt-sm="15" flex="0"></span>
+            <div layout="row" flex="35" flex-sm="60" flex-xs="60">
                 <div layout="row" flex>
                     <div flex layout="row" layout-align="center center" style="position: relative;">
                         <div class="btn-parent flat">
-                            <md-button class="no-m" aria-label="More " ng-click="redirect('home')">
+                            <md-button class="no-m" aria-label="More " ng-click="redirect('web.app.dashboard.home')">
                                 <my-icon icon="home">
                                 </my-icon>
                             </md-button>
                         </div>
                     </div>
-                    <div flex layout="row" ng-show="user.authenticated" layout-align="center center" style="position: relative;">
+                    <div flex layout="row" ng-if="user.authenticated" layout-align="center center" style="position: relative;">
                         <div class="btn-parent flat">
-                            <md-button class="no-m" aria-label="More " ng-click="redirect('login')">
+                            <md-button class="no-m" aria-label="More " ng-click="redirect('web.app.login')">
                                 <my-icon icon="email-outline">
                                 </my-icon>
                             </md-button>
@@ -45,8 +45,8 @@
                     </div>
                 </div>
             </div>
-            <span flex="15" flex-md="0" flex-sm="0"></span>
-            <div layout="row" flex="35" flex-md="40" flex-sm="40">
+            <span flex-gt-sm="15" flex="0"></span>
+            <div layout="row" flex="35" flex-sm="40" flex-xs="40">
                 <div layout="row" flex>
                     <div flex layout="row" layout-align="end center" style="position: relative;">
                         <div hide-gt-md class="btn-parent flat">
@@ -70,7 +70,7 @@
                                         </md-button>
                                     </md-menu-item>
                                     <md-menu-item ng-hide="user.authenticated">
-                                        <md-button ng-click="redirect('login')">
+                                        <md-button ng-click="redirect('web.app.login')">
                                             <my-icon class="text-muted" icon="login"></my-icon>
                                             Login
                                         </md-button>

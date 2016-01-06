@@ -62,6 +62,23 @@ class Tools {
 		}
 	}
 
+	public static function uploadToAmazon($file, $key){
+		$client = Aws\S3\S3Client::factory([
+			'region' => 'us-west-2',
+			'version' => '2006-03-01',
+			'http' => ['verify' => false]
+				]
+			);
+		$bucket = getenv('S3_BUCKET')?: die('No "S3_BUCKET" config var in found in env!');
+
+		$result = $client->putObject(array(
+				    'Bucket'     => $bucket,
+				    'Key'        => 'posts/' . $key,
+				    'SourceFile' => $file
+				));
+		return $result;
+	}
+
 
 
 };

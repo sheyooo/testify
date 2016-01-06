@@ -10,20 +10,21 @@ var app = angular.module('testify', ['ngMaterial',
     'restangular',
     'facebook',
     'ngFileUpload',
-    'ngTextTruncate'
+    'ngTextTruncate',
+    'emojiApp'
 ]);
 
 //app.constant('apiBase', "http://localhost/testify/api");
 app.constant('appUrl', "https://testify-for-testimonies.herokuapp.com");
 app.constant('appBase', "/");
-//app.constant('apiBase', "http://localhost/testify/api");
-app.constant('apiBase', "https://testify-for-testimonies.herokuapp.com/api");
+app.constant('apiBase', "http://localhost:8000/api/v1");
+//app.constant('apiBase', "https://testify-for-testimonies.herokuapp.com/api");
 
 app.config(function(FacebookProvider, $httpProvider, RestangularProvider, apiBase) {
     FacebookProvider.setAppId(180042792329807);
     RestangularProvider.setBaseUrl(apiBase);
 
-    $httpProvider.interceptors.push(['$q', '$location', '$localStorage', function($q, $location, $localStorage) {
+    $httpProvider.interceptors.push(['$q', '$location', '$localStorage', function($q, $location, $localStorage, $rootScope, Auth) {
         return {
             'request': function(config) {
                 config.headers = config.headers || {};
@@ -34,6 +35,7 @@ app.config(function(FacebookProvider, $httpProvider, RestangularProvider, apiBas
             },
             'response': function(response) {
                 if (t = response.headers('Authorization')) {
+                    t.replace('Bearer ', '');
                     $localStorage.token = t;
                     //console.log(t);
                 }
@@ -41,11 +43,27 @@ app.config(function(FacebookProvider, $httpProvider, RestangularProvider, apiBas
                 return response;
             },
             'responseError': function(response) {
-                if (response.status === 401 && response.data.status == "Invalid Authorization" || response.status === 403) {
-                    if (response.data.status == "Invalid Token") {
+                if (response.status === 401 || response.status === 400 || response.status === 403) {
+                    if (response.data.error == 'token_expired') {
                         delete $localStorage.token;
+                        Auth.resetProfile();
+                        $location.path('/signin');
+                    } else if (response.data.error == 'token_invalid') {
+                        delete $localStorage.token;
+                        Auth.resetProfile();
+                        $location.path('/signin');
+                    } else if (response.data.error == 'Bad Authorization') {
+                        delete $localStorage.token;
+                        Auth.resetProfile();
+                        $location.path('/signin');
+                    } else if (response.data.error == 'token_not_provided') {
+                        delete $localStorage.token;
+                        Auth.resetProfile();
                         $location.path('/signin');
                     }
+
+
+
                     console.log("Unauthorized or forbidden");
 
                 }
@@ -71,7 +89,7 @@ app.run(function() {
     }(document, 'script', 'facebook-jssdk'));*/
 });
 
-app.config(function($mdThemingProvider, $mdIconProvider) {
+app.config(function($mdThemingProvider) {
     var myPaletteMap = $mdThemingProvider.extendPalette('blue', {
 
         'contrastDefaultColor': 'light',
@@ -121,89 +139,89 @@ app.config(function($mdThemingProvider, $mdIconProvider) {
             'default': '50'
         }).dark();
 
-    $mdIconProvider.defaultFontSet("mdi", "mdi-");
+    ///$mdIconProvider.defaultFontSet("mdi", "mdi-");
 });
 
 app.config(function($stateProvider, $urlRouterProvider, $locationProvider, appBase) {
     $stateProvider
-        .state('home', {
-            url: appBase + '',
-            views: {
-                "leftNav": {
-                    templateUrl: "partials/left-sidenav.html"
-                },
-                "MainContent": {
-                    templateUrl: 'views/home.html'
-                },
-                "rightNav": {
-                    templateUrl: "partials/right-sidenav.html"
-                }
-            }
-        }).state('login', {
-            url: appBase + 'login',
-            views: {
-                "leftNav": {},
-                "MainContent": {
-                    templateUrl: 'views/login.html'
-                },
-                "rightNav": {}
-            }
-        }).state('signup', {
-            url: appBase + 'signup',
+        .state('web', {
+            //url: appBase,
+            abstract: true,
+            templateUrl: 'views/web.html'
+        }).state('web.app', {
+            abstract: true,
+            url: appBase,
+            templateUrl: 'views/web.app.html'
+        }).state('web.app.login', {
+            url: 'login',
+            templateUrl: 'views/web.app.login.html',
+        }).state('web.app.signup', {
+            url: 'signup',
             controller: 'LoginCtrl',
-            views: {
-                "leftNav": {},
-                "MainContent": {
-                    templateUrl: 'views/signup.html'
-                },
-                "rightNav": {}
+            templateUrl: 'views/web.app.signup.html',
+            data: {
+                showSideNav: false
             }
-        }).state('logout', {
-            url: appBase + 'logout',
+        }).state('web.app.logout', {
+            url: 'logout',
+
+            controller: 'LogoutCtrl',
+            template: " ",
+            data: {
+                showSideNav: false
+            }
+        }).state('web.app.landing', {
+            url: '',
+            templateUrl: 'views/web.app.landing.html',
+        }).state('web.app.dashboard', {
+            abstract: true,
+            url: '',
+            templateUrl: 'views/web.app.dashboard.html',
+        }).state('web.app.dashboard.home', {
+            url: 'home',
+            templateUrl: 'views/web.app.dashboard.home.html'
+        }).state('web.app.dashboard.post', {
+            url: 'post/:hash_id',
+            templateUrl: 'views/web.app.dashboard.post.html'
+        }).state('web.app.dashboard.posts', {
+            url: 'posts?cat',
+            templateUrl: 'views/web.app.dashboard.home.html'
+        }).state('web.app.dashboard.user', {
+            url: 'user/:hash_id',
+            resolve: {
+                profile: function($stateParams, Restangular) {
+                    return Restangular.one('users', $stateParams.hash_id).get();
+                }
+            },
             views: {
-                "leftNav": {
-                    template: " "
+                '': {
+                    templateUrl: "views/web.app.dashboard.profile.html",
+                    controller: 'ProfileCtrl',
                 },
-                "MainContent": {
-                    controller: 'LogoutCtrl',
-                    template: " "
-                },
-                "rightNav": {
-                    template: " "
+                '@web.app.dashboard.user': {
+                    templateUrl: 'views/web.app.dashboard.profile.activities.html',
                 }
             }
-        }).state('entrance', {
-            url: appBase + 'entrance',
+        }).state('web.app.dashboard.user.activities', {
+            url: '/activities',
+            templateUrl: 'views/web.app.dashboard.profile.activities.html',
+        }).state('web.app.dashboard.user.favorites', {
+            url: '/favorites',
+            templateUrl: 'views/web.app.dashboard.profile.favorites.html',
+        }).state('web.app.dashboard.user.taps', {
+            url: '/taps',
+            templateUrl: 'views/web.app.dashboard.profile.taps.html',
+        }).state('web.app.dashboard.user.edit', {
+            url: '/edit',
             views: {
-                "leftNav": {},
-                "MainContent": {
-                    templateUrl: 'views/entrance.html'
-                },
-                "rightNav": {}
-            }
-        }).state('user', {
-            url: '/user/:hash_id',
-            views: {
-                "leftNav": {
-                    templateUrl: "partials/left-sidenav.html"
-                },
-                "MainContent": {
-                    templateUrl: "views/profile.html",
-                    controller: 'ProfileCtrl',
-                    resolve: {
-                        profile: function($stateParams, Restangular) {
-                            return Restangular.one('users', $stateParams.hash_id).get();
-                        }
-                    },
-                },
-                "rightNav": {
-                    templateUrl: "partials/right-sidenav.html"
+                '@web.app.dashboard': {
+                    templateUrl: 'views/web.app.dashboard.profile.edit.html'
 
                 }
             }
         });
 
-    $urlRouterProvider.otherwise(appBase + "");
+    $urlRouterProvider.otherwise(appBase + "home");
 
     $locationProvider.html5Mode({
         enabled: true,

@@ -7,12 +7,12 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 
 	class App{
 
-		public static function getPosts($h){
+		public static function getPosts($prms){
 			$arr = false;
 			$conn = Connection::getInstance("read");
 			$command = "SELECT * FROM posts 
 						ORDER BY time DESC 
-						LIMIT {$h} ";
+						LIMIT 15 ";
 
 			$result = $conn->execObject($command);
 			if(mysqli_num_rows($result)){
@@ -20,6 +20,61 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 						//$row['timestamp'] = strtotime($row['time']);
 						$post = new Post($row['post_id']);
 						$arr[] = $post;
+					}
+				return $arr;
+			}else{
+				return $arr;
+			}
+		}
+
+		public static function getActivitiesTime(){
+
+		}
+
+		public static function getActivities($prms){
+			$arr = [];
+			$conn = Connection::getInstance("read");
+			$command = "SELECT id, posts.post_id FROM posts
+				LEFT JOIN post_activities
+				ON(posts.post_id = post_activities.post_id)";
+
+				if(isset($prms['user_id'])){
+					$command .= " WHERE post_activities.user_id = {$prms['user_id']}
+							OR (posts.user_id = 
+							{$prms['user_id']}  AND posts.anonymous = 0)";
+				}
+
+				if(isset($prms['offset']) && isset($prms['direction'])){
+					if($prms['direction'] == "after"){
+						$command .= " AND( UNIX_TIMESTAMP(posts.time) > {$prms['offset']} OR UNIX_TIMESTAMP(post_activities.time) > {$prms['offset']} )";
+					}elseif($prms['direction'] == "before"){
+						$command .= " AND (UNIX_TIMESTAMP(posts.time) < {$prms['offset']} OR UNIX_TIMESTAMP(post_activities.time) < {$prms['offset']})";
+					}
+
+				}
+
+				$command .= " GROUP BY posts.post_id
+				ORDER BY post_activities.time DESC, 
+				posts.time DESC  ";
+
+				if(isset($prms['limit'])){
+					$command .= " LIMIT {$prms['limit']}";
+				}else{
+					$command .= " LIMIT 20";
+				}
+			
+
+			$result = $conn->execObject($command);
+			if(mysqli_num_rows($result)){
+				while ($row = mysqli_fetch_assoc($result)) {
+						
+						if($row['id']){
+							$arr[] = new PostActivity($row['post_id']);
+
+						}elseif($row['post_id']){
+							$arr[] = new Post($row['post_id']);
+
+						}
 					}
 				return $arr;
 			}else{
@@ -129,25 +184,7 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 
 		}
 
-		public static function registerUserFromFacebook($fb_id, $token, $first_name, $last_name, $email){
-			
-
-			
-
-			if (!filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
-				$conn = Connection::getInstance("write");
-				$command = "INSERT INTO users (first_name, last_name, email)
-							VALUES('{$first_name}','{$last_name}','{$email}')";
-
-				$result = $conn->execInsert($command);
-				if($result){
-					return true;
-				}
-			}else{
-				
-			}
-
-		}
+		
 
 		public static function registerUserWithPassword($name, $email, $password){
 
@@ -156,7 +193,8 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 		public static function getCategories(){
 			$conn = Connection::getInstance("read");
 
-			$command = "SELECT * FROM categories";
+			$command = "SELECT * FROM categories
+						ORDER BY sort ASC";
 
 			$result = $conn->execObject($command);
 

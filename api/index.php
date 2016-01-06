@@ -113,20 +113,27 @@ $app->get('/users/:hash_id/', function($hash_id) use ($app){
 	};
 });
 
-$app->get('/users/:id/posts', function($id) use ($app){
-	$o = $app->request->getBody();
-	$o = json_decode($o);
+$app->get('/users/:hash_id/posts', function($hash_id) use ($app){
+	$req = $app->request;
+	$prms = [];
+	if($req->get("limit"))
+		$prms['limit'] = $req->get("limit");
 
+	if($req->get("offset") && $req->get("direction")){
+		$prms['offset'] = $req->get("offset");
+		$prms['direction'] = $req->get("direction");
+	}
 	
+	try{
+		$id = User::decodeHashID($hash_id);
+	}
+	catch(Exception $e){
+		$id = $hash_id;
+	};
+	$prms['user_id'] = $id;
 
-	
-
-	/*if($id = $u->createPost($p, $a)){
-		$app->response()->status(201);
-		echo json_encode(array("post_id" => $id));
-	}else{
-		$app->response()->status(409);
-	}*/
+	$posts = App::getActivities($prms);
+	echo json_encode(Utility::formatActivitiesToPosts($posts, $app));	
 });
 
 $app->post('/users/:id/posts', function($id) use ($app){
@@ -201,98 +208,8 @@ $app->post('/users/:id/posts', function($id) use ($app){
 });
 
 $app->get('/posts', function() use ($app){
-
-	$posts = App::getPosts(15);
-
-	if(is_array($posts)){
-
-		foreach ($posts as $post) {
-
-			$post_id = $post->getID();
-			$liked = false;
-			$tapped_into = false;
-			$likes = $post->countLikes();
-			$comments = $post->countComments();
-			$taps = $post->countTaps();
-			$text = $post->getText();
-			$time = $post->getTime();
-			$cat = $post->getCategory()->getName();
-			$ijson = [];
-
-			if (!$post->isAnonymous()) {
-				try{
-					$u = $post->getAuthor();			
-					$user_id = $u->getID();
-					$hash_id = $u->getHashID();
-					$avatar = $u->getProfilePictureURL();
-					$name = $u->getFullname();	
-				}catch(Exception $e){
-					$user_id = "anonymous";
-					$hash_id = "anonymous";
-					$avatar = "img/favicon.png";
-					$name = "Anonymous Testimony";	
-
-				}
-						 
-			}else{
-				$user_id = "anonymous";
-				$hash_id = "anonymous";
-				$avatar = "img/favicon.png";
-				$name = "Anonymous Testimony";			 
-			}
-
-			if($id = $app->environment()['testify.user_id']){
-				$user = new User($id);
-
-				if($post->isLiked($user)){
-					$liked = true;
-				}
-				if($post->isTappedInto($user)){
-					$tapped_into = true;
-				}
-			};
-
-			$i = $post->getImages();
-			if(count($i)){
-				foreach ($i as $img) {
-					$ijson[] = [
-							"url" => $img->getUrl(),
-							"alt" => $img->getFileName(),
-							"user_id" => $img->getUserID(),
-							"time" => $img->getTime()
-							];
-						}
-			};
-
-			$j = [
-				"post_id" => $post_id,
-				"liked" => $liked,
-				"tapped_into" => $tapped_into,			
-				"likes_count" => $likes,
-				"comments_count" => $comments,
-				"taps_count" => $taps,
-				"text" => $text,
-				"time" => $time,
-				"category" => $cat,
-				"user" => [
-					"user_id" => $user_id,
-					"hash_id" => $hash_id,
-					"avatar" => $avatar,
-					"name" => $name
-					],
-				"images" => $ijson,
-				"comments" => []
-				];
-
-			$json[] = $j;
-		}
-
-		echo json_encode($json);
-	}else{
-		echo json_encode([]);
-	}
-
-	
+	$posts = App::getPosts(["limit" => 25, "user_id" => 13]);
+	echo json_encode(Utility::formatActivitiesToPosts($posts, $app));	
 });
 
 $app->delete('/posts/:id', function($id) use ($app){
@@ -306,28 +223,28 @@ $app->delete('/posts/:id', function($id) use ($app){
 	}
 });
 
-$app->post('/posts/:id/likes', function($id) use ($app){
+$app->post('/posts/:id/favorites', function($id) use ($app){
 	if($uid = $app->environment['testify.user_id']){	
 		$post = new Post($id);
 			if($post){
 				$u = new User($uid);
-				$u->likePost($post, true);
+				$u->favoritePost($post, true);
 				echo json_encode(array(
-				"likes" => $post->countLikes(),
+				"favorites" => $post->countFavorites(),
 				"status" => true)
 			);
 		}
 	}
 });
 
-$app->delete('/posts/:id/likes', function($id) use ($app){
+$app->delete('/posts/:id/favorites', function($id) use ($app){
 	if($uid = $app->environment['testify.user_id']){	
 		$post = new Post($id);
 			if($post){
 				$u = new User($uid);
-				$u->likePost($post, false);
+				$u->favoritePost($post, false);
 				echo json_encode(array(
-				"likes" => $post->countLikes(),
+				"favorites" => $post->countFavorites(),
 				"status" => false)
 			);
 		}
@@ -342,6 +259,20 @@ $app->post('/posts/:id/taps', function($id) use ($app){
 				$u->tapPost($post, true);
 				echo json_encode(array(
 				"taps" => $post->countTaps(),
+				"status" => true)
+			);
+		}
+	}
+});
+
+$app->post('/posts/:id/amens', function($id) use ($app){
+	if($uid = $app->environment['testify.user_id']){	
+		$post = new Post($id);
+			if($post){
+				$u = new User($uid);
+				$u->sayAmen($post, true);
+				echo json_encode(array(
+				"amen_count" => $post->countAmens(),
 				"status" => true)
 			);
 		}
@@ -392,10 +323,11 @@ $app->get('/posts/:id/comments', function($id) use ($app){
 $app->post('/posts/:id/comments', function($id) use ($app){
 	$b = json_decode($app->request->getBody());
 	$post = new Post($id);
+	$u = new User($app->environment()['testify.user_id']);
 
 	if($post){
-		if($id = $post->addComment(["user_id" => $app->environment()['testify.user_id'],
-			"text" => $b->text])){
+		if($id = $u->postComment($post,$b->text)){
+			
 			$app->response->status(201);
 			echo json_encode(["status" => true,
 								"comment_id" => $id,
@@ -413,13 +345,7 @@ $app->post('/posts/:id/comments', function($id) use ($app){
 });
 
 $app->post('/images', function() use ($app){
-	$client = Aws\S3\S3Client::factory([
-		'region' => 'us-west-2',
-		'version' => '2006-03-01',
-		'http' => ['verify' => false]
-			]
-		);
-	$bucket = getenv('S3_BUCKET')?: die('No "S3_BUCKET" config var in found in env!');
+	
 	
 	$user_id = $app->environment()['testify.user_id'];
 
@@ -428,16 +354,11 @@ $app->post('/images', function() use ($app){
 	    // FIXME: add more validation, e.g. using ext/fileinfo
 	    try {
 	        $key = $user_id . time() . $_FILES['file']['name'];
-	        $result = $client->putObject(array(
-			    'Bucket'     => $bucket,
-			    'Key'        => 'posts/' . $key,
-			    'SourceFile' => $_FILES['file']['tmp_name']
-			));
+	        Tools::uploadToAmazon($_FILES['file']['tmp_name'], $key);
 
 			$r = ["file_name" => $key,
 	  			"url" => "https://testify.imgix.net/" . $key,
-	  			"user_id" => $user_id
-	  			];
+	  			"user_id" => $user_id];
 
 		  	$id = Image::addTemp($r);
 		  	if($r){
@@ -514,7 +435,10 @@ $app->get('/cele', function() use ($app){
 		//echo json_encode($json);
 	}*/
 
-	echo Tools::generateHashID("user",13);
+	//echo Tools::generateHashID("user",13);
+	$fb = "https://scontent.xx.fbcdn.net/hprofile-xpf1/v/t1.0-1/c0.210.540.540/11924754_919608601443630_3427903200323619364_n.jpg?oh=75d9a51a2e8e26c51678cfff510dc82a&oe=56FA5CD2";
+	echo __DIR__;
+	copy($fb, "../img/fb.jpg");
 });
 
 

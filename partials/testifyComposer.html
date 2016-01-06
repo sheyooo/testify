@@ -1,0 +1,93 @@
+<div ng-if="user.authenticated" style="position: relative">
+    <form name="composer" novalidate>
+        <md-card style="overflow: hidden">
+            <md-toolbar layout="row" class="md-hue-2">
+                <div class="md-toolbar-tools" layout="row">
+                    <div flex="90" layout="row">
+                        <div class="square-img-container mr10" style="width: 40px; height: 40px;">
+                            <img class="img-circle" ng-src="{{ user.avatar || 'img/guest.png'}}">
+                        </div>
+                        <h2>{{ user.name }}</h2>
+                    </div>
+                    <md-button class="md-primary md-hue-2 md-fab md-mini" ng-click="selectCategories($event)">
+                        <my-icon icon="tag-multiple"></my-icon>
+                        <md-tooltip md-delay="400" md-direction="right" md-autohide="true">
+                            Select categories
+                        </md-tooltip>
+                    </md-button>
+                </div>
+            </md-toolbar>
+            <md-card-content layout="column" class="pb0">
+                <style type="text/css">
+                .emoji-wysiwyg-editor {
+                    font-size: 14px;
+                    overflow: hidden;
+                    height: auto;
+                }
+                
+                .emoji-menu {
+                    margin-top: 0px;
+                    margin-left: -200px;
+                }
+                </style>
+                <div emoji-form emoji-message="emojiMessage" layout="row">
+                    <textarea placeholder="share your testimony..." id="messageInput" ng-model="post"></textarea>
+                    <button id="emojibtn" style="height: 36px; border: none">
+                        <i class="icon icon-emoji"></i>
+                    </button>
+                </div>
+                <!-- <md-divider></md-divider> -->
+            </md-card-content>
+            <div ng-show="!composingPost">
+                <div class="pl5 pr5">
+                    <label ng-repeat="c in selectedCategories">
+                        {{::c.name}}
+                    </label>
+                </div>
+                <div class="images-box" layout="row" layout-wrap>
+                    <div flex="33" flex-xs="50" layout="column" ng-repeat="img in files track by $index">
+                        <md-card flex class="bg-light-gray" style="position: relative" layout="row" layout-align="center center">
+                            <md-button class="md-icon-button" md-no-ink aria-label="Remove picture" style="color: white; text-shadow: 0px 1px 1px #000; position: absolute; top: 0px; left: 0px; z-index: 10;" ng-click="removePicture($index)">
+                                <my-icon icon="close"></my-icon>
+                            </md-button>
+                            <div flex class="square-img-container">
+                                <img ngf-src="img || 'img/testify.png'" ngf-no-oject-url="true" />
+                            </div>
+                            <md-progress-circular class="composer-img-upload-progress" md-mode="determinate" ng-hide="img.complete" value="{{img.progress}}"></md-progress-circular>
+                        </md-card>
+                    </div>
+                </div>
+                <md-button class="md-primary md-mini" accept="image/*" ngf-keep="'distinct'" ngf-select ngf-max-size="'2MB'" ng-model="files" multiple="multiple">
+                    <my-icon icon="camera"></my-icon>
+                    Add Image
+                    <md-tooltip md-delay="400" md-direction="down" md-autohide="true">
+                        2MB max image size
+                    </md-tooltip>
+                </md-button>
+                <md-divider></md-divider>
+                <div class="" layout="row">
+                    <span flex></span>
+                    <md-switch name="anonymous" aria-label="Post anonymously" class="text-muted md-caption" ng-model="anonymous">
+                        Post anonymously
+                        <md-tooltip md-delay="400" md-direction="left" md-autohide="true">
+                            Make this post anonymous
+                        </md-tooltip>
+                    </md-switch>
+                    <div layout="row" layout-padding>
+                        <md-button ng-disabled="!user.authenticated" style="color: white;" class="md-primary md-hue-2 md-raised" layout="row" ng-click="composePost($event)">
+                            <span ng-hide="newPost.creating">
+                                        <my-icon icon="send" style="line-height: 0px;
+                                        position: relative;
+                                        top: -2px;"></my-icon>
+                                        <span>Post</span>
+                            </span>
+                            <span ng-show="newPost.creating">
+                                            Sending...
+                                        </span>
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </md-card>
+    </form>
+</div>

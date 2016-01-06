@@ -2,36 +2,36 @@
 class User{
 	private $id;
 	private $hash_id;
-	private $school_id;
-	private $title;
 	protected $first_name;
 	protected $last_name;
 	private $avatar;
 	private $sex;
-	private $type;
+	private $location;
 	private $username;
 	private $phone;
 	private $email;
 	private $online_status;
 	private $fields_from_db;
+	private static $salt = "user";
 
 	public function __construct($id){
 		$conn = Connection::getInstance("read");
 		$command = "SELECT * FROM users
-					WHERE user_id = {$id}";
+					LEFT JOIN profile ON (users.user_id = profile.user_id)
+					WHERE users.user_id = {$id}";
 		$result = $conn->execObject($command);
 	
 		if(mysqli_num_rows($result)){
 			$row = mysqli_fetch_assoc($result);
 			unset($row['password']);		
-			$this->initialized = true;
-			$this->id = $row['user_id'];
+			$this->id = $id;
 			$this->hash_id = $row['hash_id'];
 			$this->first_name = $row['first_name'];
 			$this->last_name = $row['last_name'];
 			$this->avatar = $row['avatar'];
 			$this->email = $row['email'];
 			$this->sex = $row['sex'];
+			$this->location = trim($row['state'] . ", " . $row['country']);
 			$this->fields_from_db = $row;
 		} else{
 			throw new Exception("Invalid id not found in the database");
@@ -53,12 +53,8 @@ class User{
 		return $this->hash_id;
 	}
 	public function getFullname(){
-		$t = $this->type;
-		if($t == "parent" OR $t == "admin" OR $t == "teacher"){
-			return $this->title . " " . $this->first_name . " " . $this->last_name;
-		}else{
-			return $this->first_name . " " . $this->last_name;
-		}
+		
+		return $this->first_name . " " . $this->last_name;
 	}
 	public function getFirstName(){
 
@@ -102,18 +98,36 @@ class User{
 
 	}
 
-	public function likePost($p, $type){
+	public function getLocation(){
+
+		if(!$this->location OR $this->location == ",")
+			return "";
+
+		return $this->location;
+	}
+
+	public function favoritePost($p, $type){
 		$conn = Connection::getInstance("write");
 		if($type){
-			$command = "REPLACE INTO likes (post_id, user_id)
+			$command = "REPLACE INTO favorites (post_id, user_id)
 						VALUES({$p->getID()}, {$this->id})";
 			$result = $conn->execInsert($command);
+			PostActivity::logActivity(["action" => "favorite",
+										"action_id" => $result,
+										"post_id" => $p->getID(),
+										"user_id" => $this->id]);
+
+
 			return true;
 		}else{
-			$command = "DELETE FROM likes 
+			$command = "DELETE FROM favorites 
 						WHERE user_id = {$this->id}
 						AND post_id = {$p->getID()}";
 			$result = $conn->execDelete($command);
+
+			PostActivity::deleteActivity(["action" => "tap",
+										"post_id" => $p->getID(),
+										"user_id" => $this->id]);
 
 			return false;
 		}
@@ -125,14 +139,67 @@ class User{
 			$command = "REPLACE INTO taps (post_id, user_id)
 						VALUES({$p->getID()}, {$this->id})";
 			$result = $conn->execInsert($command);
+
+			PostActivity::logActivity(["action" => "tap",
+										"action_id" => $result,
+										"post_id" => $p->getID(),
+										"user_id" => $this->id]);
+
 			return true;
 		}else{
 			$command = "DELETE FROM taps 
 						WHERE user_id = {$this->id}
 						AND post_id = {$p->getID()}";
 			$result = $conn->execDelete($command);
+			PostActivity::deleteActivity(["action" => "tap",
+										"post_id" => $p->getID(),
+										"user_id" => $this->id]);
 
 			return false;
+		}
+	}
+
+	public function sayAmen($p, $type){
+		$conn = Connection::getInstance("write");
+		if($type){
+			$command = "REPLACE INTO amens (post_id, user_id)
+						VALUES({$p->getID()}, {$this->id})";
+			$result = $conn->execInsert($command);
+
+			PostActivity::logActivity(["action" => "amen",
+										"action_id" => $result,
+										"post_id" => $p->getID(),
+										"user_id" => $this->id]);
+			return true;
+		}else{
+			$command = "DELETE FROM amens 
+						WHERE user_id = {$this->id}
+						AND post_id = {$p->getID()}";
+			$result = $conn->execDelete($command);
+			PostActivity::deleteActivity(["action" => "amen",
+										"post_id" => $p->getID(),
+										"user_id" => $this->id]);
+
+			return false;
+		}
+	}
+
+	public function postComment($p, $text){
+		if($p AND $text = trim($text)){
+
+			$conn = Connection::getInstance("write");
+			$command = "INSERT INTO comments (post_id, user_id, text) VALUES({$p->getID()}, {$this->id}, '{$text}')";
+			$id = $conn->execInsert($command);
+
+			PostActivity::logActivity(["action" => "comment",
+										"action_id" => $id,
+										"post_id" => $p->getID(),
+										"user_id" => $this->id]);
+			if($id){
+				return $id;
+			}else{
+				return false;
+			}
 		}
 	}
 
@@ -336,7 +403,7 @@ class User{
 		$command = "REPLACE INTO users ({$columns}) VALUES({$values})";
 		$id = $conn->execInsert($command);
 		if($id){
-			$hash_id = Tools::generateHashID('user', $id);
+			$hash_id = self::generateHashID($id);
 			$command = "UPDATE users 
 						SET hash_id = '{$hash_id}'
 						WHERE user_id = {$id}";
@@ -345,6 +412,14 @@ class User{
 		}else{
 			return false;
 		}
+	}
+
+	public static function decodeHashID($hash_id){
+		return Tools::decodeHashID(self::$salt, $hash_id);
+	}
+
+	public static function generateHashID($id){
+		return Tools::generateHashID(self::$salt, $id);
 	}
 
 }

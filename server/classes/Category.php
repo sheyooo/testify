@@ -38,7 +38,7 @@ class Category {
 	public function countPosts(){
 		$conn = Connection::getInstance("read");
 		$command = "SELECT COUNT(*) AS count 
-					FROM posts 
+					FROM post_to_cats 
 					WHERE cat_id = {$this->id}";
 		$r = $conn->execObject($command);
 		$row = mysqli_fetch_assoc($r);

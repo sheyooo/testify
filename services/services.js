@@ -1,5 +1,9 @@
 app.factory('AppService', ['Restangular', 'Auth', 'Me', function(Restangular, Auth, Me) {
 
+    var app = {
+        posts: []
+    };
+
     Auth.refreshProfile().then(function(r) {
         //Me.callInit();
         //console.log("letsee");
@@ -14,6 +18,7 @@ app.factory('AppService', ['Restangular', 'Auth', 'Me', function(Restangular, Au
 
 
     return {
+        app: app,
         search: search,
         getPosts: getPosts,
         getCategories: getCategories
@@ -24,7 +29,7 @@ app.factory('AppService', ['Restangular', 'Auth', 'Me', function(Restangular, Au
 app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', 'Facebook', function($http, $localStorage, Restangular, $q, $state, Facebook) {
     var user = {
         authenticated: false,
-        user_id: null,
+        id: null,
         hash_id: null,
         name: "Guest",
         firstName: "Guest",
@@ -69,24 +74,32 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', 'F
 
     var refreshProfile = function() {
         //console.log("refresh")
+        //console.log(getClaimsFromToken());
+
         var d = $q.defer();
-        if (getClaimsFromToken().hash_id) {
+        if (getClaimsFromToken().hash_id && getClaimsFromToken().exp > Date.now() / 1000) {
             //console.log("truthy");
-            //console.log(getClaimsFromToken().user_id);
+            //console.log(getClaimsFromToken().hash_id);
+            //console.log(Date.now() / 1000);
+            //console.log(getClaimsFromToken().exp);
 
             Restangular.one('users', getClaimsFromToken().hash_id).get().then(function(r) {
                 buildAuthProfile(r.data);
                 d.resolve(true);
-                //console.log(getClaimsFromToken().user_id);
+                //console.log(getClaimsFromToken().id);
             }, function(r) {
                 if (r.status == 404) {
                     resetProfile();
+                    //console.log("user not found");
                     logout();
                 }
                 d.resolve(false);
+
             });
         } else {
-            //console.log("falsy");
+            //console.log(Date.now() / 1000);
+            //console.log(getClaimsFromToken().exp);
+            //delete $localStorage.token;
             resetProfile();
         }
 
@@ -94,9 +107,9 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', 'F
     };
 
     var buildAuthProfile = function(u) {
-        //console.log(user, u);
+        //console.log(u);
         user.authenticated = true;
-        user.user_id = u.user_id;
+        user.id = u.id;
         user.hash_id = u.hash_id;
         user.name = u.first_name + ' ' + u.last_name;
         user.firstName = u.first_name;
@@ -114,8 +127,20 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', 'F
     };
 
     var signup = function(newUser) {
+        var d = $q.defer();
 
-        return Restangular.all('users').post(newUser);
+        Restangular.service('signup').post(newUser).then(function(r) {
+            //console.log(r);
+            saveToken(r.data.token);
+            refreshProfile(); //Refresh session data here
+            //$scope.refreshProfile();
+            $state.go('web.app.dashboard.home');
+            d.resolve(r.data.token);
+        }, function() {
+            d.reject();
+        });
+
+        return d.promise;
     };
 
     var signin = function(l) {
@@ -126,7 +151,7 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', 'F
             saveToken(r.data.token);
             refreshProfile(); //Refresh session data here
             //$scope.refreshProfile();
-            $state.go('home');
+            $state.go('web.app.dashboard.home');
             d.resolve(r.data.token);
         }, function() {
             d.reject();
@@ -139,40 +164,34 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', 'F
         //console.log("loginctrl");
         var d = $q.defer();
 
-        Facebook.getLoginStatus(function(r) {
-            if (r.status == 'connected') {
-                //console.log("hh");
+        var doFbLogin = function(fb_response) {
+            var d = $q.defer();
+            r = fb_response;
+            if (r.status === 'connected') {
                 json = {
                     "fb_access_token": r.authResponse.accessToken
                 };
                 Restangular.service('fb-token').post(json).then(function(r) {
                     saveToken(r.data.token);
                     refreshProfile(); //Refresh session data here
-                    d.resolve(r.data.token);
-
+                    //console.log(r);
+                    d.resolve(r);
                 }, function(r) {
                     d.reject(r);
                 });
             } else {
-                Facebook.login(function(r) {
-                    //console.log(r);
-                    if (r.status === 'connected') {
-                        json = {
-                            "fb_access_token": r.authResponse.accessToken
-                        };
-                        Restangular.service('fb-token').post(json).then(function(r) {
-                            saveToken(r.data.token);
-                            refreshProfile(); //Refresh session data here
-                            d.resolve(r.data.token);
-                        }, function(r) {
-                            d.reject(r);
-                        });
-                    } else {
-                        d.reject(false);
-                        return "Login failed";
-                    }
-                });
+                d.reject();
             }
+            return d.promise;
+        };
+
+        Facebook.login(function(r) {
+            //console.log(r);
+            doFbLogin(r).then(function() {
+                d.resolve();
+            }, function(r) {
+                d.reject(r);
+            });
         });
 
         return d.promise;
@@ -182,12 +201,12 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', 'F
         tokenClaims = {};
         delete $localStorage.token;
         refreshProfile();
-        $state.go('login');
+        $state.go('web.app.login');
     };
 
     var resetProfile = function() {
         user.authenticated = false;
-        user.user_id = null;
+        user.id = null;
         user.hash_id = null;
         user.name = "Guest";
         user.firstName = "Guest";
@@ -212,15 +231,16 @@ app.factory('Auth', ['$http', '$localStorage', 'Restangular', '$q', '$state', 'F
 
 app.factory('Me', ['Auth', 'Restangular', '$q', function(Auth, Restangular, $q) {
 
-    var uid = Auth.token.user_id;
+    var uid = Auth.token.sub;
+    //console.log(uid);
 
     var me = Restangular.one('users', uid);
 
     var sendPost = function(o) {
-        return me.post("posts", {
+        return Restangular.all('posts').post({
             "post": o.post,
             "anonymous": o.anonymous,
-            "category": o.category,
+            "categories": o.categories,
             "images": o.images
         });
     };
@@ -229,6 +249,7 @@ app.factory('Me', ['Auth', 'Restangular', '$q', function(Auth, Restangular, $q) 
         id: uid,
         me: me,
         authenticated: Auth.userProfile.authenticated,
+        favorites: me.all('favorites'),
         profile: Auth.userProfile,
         sendPost: sendPost
 
@@ -249,6 +270,20 @@ app.factory('PostService', ['Restangular', '$q', function(Restangular, $q) {
 
 }]);
 
+app.factory('CommentService', ['Restangular', '$q', function(Restangular, $q) {
+
+    var posts = Restangular.all('comments');
+
+    var comment = function(id) {
+        return Restangular.one('comments', id);
+    };
+
+    return {
+        comment: comment
+    };
+
+}]);
+
 app.factory('SocialService', ['Facebook', 'Auth', function(Facebook, Auth) {
 
 
@@ -264,7 +299,7 @@ app.factory('UXService', ['$mdDialog', '$mdToast', 'Auth', '$q', '$document', fu
         $mdDialog.show({
                 controller: 'UXModalLoginCtrl',
                 templateUrl: 'partials/ux.signin.modal.html',
-                parent: angular.element(document.body),
+                parent: document.getElementsByClassName("middle-content"),
                 targetEvent: ev,
                 clickOutsideToClose: true
             })
@@ -279,13 +314,15 @@ app.factory('UXService', ['$mdDialog', '$mdToast', 'Auth', '$q', '$document', fu
 
     var categorySelectModal = function(ev) {
         var d = $q.defer();
-        $mdDialog.show({
-                controller: 'UXModalPostCategorizeCtrl',
-                templateUrl: 'partials/ux.post.categorize.modal.html',
-                parent: angular.element('.middle-content'),
-                targetEvent: ev,
-                clickOutsideToClose: true
-            })
+        return $mdDialog.show({
+            controller: 'UXModalPostCategorizeCtrl',
+            templateUrl: 'partials/ux.post.categorize.modal.html',
+            hasBackdrop: false,
+            parent: angular.element(document.querySelector('.middle-content')),
+            targetEvent: ev,
+            clickOutsideToClose: true
+        });
+        /*
             .then(function(res) {
                 d.resolve(res);
                 //console.log(res);
@@ -293,7 +330,7 @@ app.factory('UXService', ['$mdDialog', '$mdToast', 'Auth', '$q', '$document', fu
                 d.reject();
             });
 
-        return d.promise;
+        return d.promise;*/
     };
 
     var alert = function(ev, text) {
@@ -313,13 +350,12 @@ app.factory('UXService', ['$mdDialog', '$mdToast', 'Auth', '$q', '$document', fu
     };
 
     var toast = function(text) {
-
         $mdToast.show(
             $mdToast.simple()
             .content(text)
             .position('top left')
-            .parent($document[0].querySelector('.main'))
-            .hideDelay(3000)
+            .parent($document[0].querySelector('body'))
+            .hideDelay(7000)
         );
 
     };
@@ -332,6 +368,15 @@ app.factory('UXService', ['$mdDialog', '$mdToast', 'Auth', '$q', '$document', fu
         });
     };
 
+    var UXSubmitLogin = function(loginDetails) {
+        Auth.signin(loginDetails).then(function(r) {
+            $mdDialog.hide(true);
+        }, function(err) {
+            console.log(err);
+            //console.log($scope.loginDetails);
+        });
+    };
+
 
 
     return {
@@ -340,7 +385,8 @@ app.factory('UXService', ['$mdDialog', '$mdToast', 'Auth', '$q', '$document', fu
         filePostModal: categorySelectModal,
         alert: alert,
         toast: toast,
-        UXLoginFB: UXLoginFB
+        UXLoginFB: UXLoginFB,
+        UXSubmitLogin: UXSubmitLogin
 
     };
 }]);

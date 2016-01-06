@@ -1,166 +1,50 @@
-app.controller('ComposerCtrl', ['$scope', 'UXService', 'AppService', '$mdToast', 'Me', 'Upload', 'apiBase', '$timeout', '$document', '$q', function($scope, UXService, AppService, $mdToast, Me, Upload,
-    apiBase, $timeout, $document, $q) {
-
-    $scope.files = [];
-    $scope.newPost = {
-        creating: false
+app.controller('PostsCtrl', ['AppService', 'Me', '$scope', '$state', '$stateParams', 'Restangular', 'UXService', '$document', function(AppService, Me, $scope, $state, $stateParams, Restangular, UXService, $document) {
+    $scope.app = AppService.app; //Post.getList();
+    $scope.post_stats = {
+        loading: false
     };
-
-    AppService.getCategories.then(function(cats) {
-        $scope.categories = cats.data;
-        //console.log(tags);
-    });
-
-    var isUploadFinished = function() {
-        finished = true;
-
-        angular.forEach($scope.files, function(file, key) {
-            if (file.complete !== true) {
-                finished = false;
-            }
-
-        });
-        return finished;
-    };
-
-    $scope.removePicture = function(i) {
-
-        $scope.files.splice(i, 1);
-    };
-
-    var uploadImages = function(files) {
-        var d = $q.defer();
-        var finished = [];
-
-        $scope.files = files;
-        if (files && files.length) {
-            angular.forEach(files, function(file) {
-                file.upload = Upload.upload({
-                    url: apiBase + '/images',
-                    data: {
-                        file: file
-                    }
-                });
-
-                file.upload.then(function(response) {
-                    file.complete = true;
-                    file.result = response.data;
-                    //console.log(response);
-                    finished.push(response.data.image_id);
-
-                    if (files.length == finished.length) {
-                        d.resolve(finished);
-                    }
-                }, function(response) {
-                    file.failed = true;
-                }, function(evt) {
-                    file.progress = Math.min(100, parseInt(100.0 *
-                        evt.loaded / evt.total));
-                });
-            });
-
-            return d.promise;
-
-        }
-    };
-
-    $scope.composePost = function(ev) {
-        //post = "";
-        post = $scope.composer.post;
-        anonymous = $scope.composer.anonymous;
-
-        if (!post) {
-            post = " ";
-        }
-
-        if (anonymous.$viewValue === false || anonymous === false) {
-            anonymous = 0;
-        } else {
-            anonymous = 1;
-        }
-
-        var createPost = function(o) {
-            //console.log(Me.sendPost);
-            $scope.newPost.creating = true;
-
-            UXService.filePostModal(ev).then(function(res) {
-                //console.log(res);
-                Me.sendPost({
-                    post: o.p,
-                    anonymous: o.a,
-                    category: res,
-                    images: o.i
-                }).then(function(r) {
-                    $scope.newPost.creating = false;
-                    $scope.composer.post = "";
-                    $scope.files = [];
-
-                    //console.log(r);
-                    //console.log($scope.posts);
-                    if (r.status === 201) {
-                        $scope.posts.unshift(r.data);
-                        //console.log(r.data);
-                    }
-                }, function(r) {
-                    $scope.newPost.creating = false;
-                });
-
-            });
-
-
-        };
-
-        if ($scope.files.length) {
-            uploadImages($scope.files).then(
-                function(id_arr) {
-                    //console.log(id_arr);
-                    createPost({
-                        p: post,
-                        a: anonymous,
-                        i: id_arr
-                    });
-                });
-        } else {
-            if (post = post.trim()) {
-                createPost({
-                    p: post,
-                    a: anonymous,
-                    i: []
-                });
-            } else {
-                UXService.alert(ev, "Post can't be empty!");
-            }
-
-        }
-    };
-}]);
-
-app.controller('PostCtrl', ['AppService', '$scope', 'Restangular', 'UXService', '$document', function(AppService, $scope, Restangular, UXService, $document) {
-    $scope.posts = []; //Post.getList();
-    $scope.loading = false;
-
     var loadPosts = function() {
+        var param = null;
+        $scope.post_stats.loading = true;
 
-        $scope.loading = true;
+        if ($stateParams.cat) {
+            load({
+                category: $stateParams.cat
+            });
+        } else {
+            load({});
+        }
 
-        AppService.getPosts.getList().then(function(r) {
-            $scope.posts = r.data;
-            $scope.loading = false;
-            //console.log(r.data.plain());
-        }, function(err) {
-            $scope.loading = false;
-            //console.log(err);
-            UXService.toast("Something's wrong");
-        });
+
+        function load(param) {
+            AppService.getPosts.getList(param).then(function(r) {
+                //console.log(AppService.app);
+                AppService.app.posts = r.data;
+                /*l = r.data.length;
+                for (i = 0; i < l; i++) {
+                    AppService.app.posts.unshift(r.data[i]);
+                }*/
+
+                $scope.post_stats.loading = false;
+                //console.log(r.data.plain());
+            }, function(err) {
+                $scope.post_stats.loading = false;
+                //console.log(err);
+                UXService.toast("Something's wrong");
+            });
+        }
     };
 
     loadPosts();
+
+
+
 }]);
 
 app.controller('LoginCtrl', ['$scope', 'UXService', 'Facebook', '$q', '$state', 'Auth', 'Me', 'appBase', function($scope, UXService, Facebook, $q, $state, Auth, Me, appBase) {
 
     if (Auth.userProfile.authenticated === true) {
-        $state.go('home');
+        $state.go('web.app.dashboard.home');
     }
 
     $scope.fb_button = "Login with Facebook";
@@ -185,12 +69,18 @@ app.controller('LoginCtrl', ['$scope', 'UXService', 'Facebook', '$q', '$state', 
 
     $scope.loginFB = function() {
         Auth.signinFB().then(function() {
-            $state.go('home');
+            $state.go('web.app.dashboard.home');
+        }, function(r) {
+            UXService.toast(r.data.error);
         });
     };
 
     $scope.UXLoginFB = function() {
         UXService.UXLoginFB();
+    };
+
+    $scope.UXSubmitLogin = function() {
+        UXService.UXSubmitLogin($scope.loginDetails);
     };
 
     var refresh = function() {
@@ -209,8 +99,8 @@ app.controller('LoginCtrl', ['$scope', 'UXService', 'Facebook', '$q', '$state', 
 
     $scope.submitLogin = function() {
         Auth.signin($scope.loginDetails).then(function(r) {
-            console.log($scope.user);
-            $state.go('home');
+            //console.log($scope.user);
+            $state.go('web.app.dashboard.home');
             //Me.callInit();
             //Success Login
         }, function(err) {
@@ -221,7 +111,7 @@ app.controller('LoginCtrl', ['$scope', 'UXService', 'Facebook', '$q', '$state', 
 
 }]);
 
-app.controller('SignupCtrl', ['$scope', 'Facebook', 'Auth', '$location', '$mdDialog', function($scope, Facebook, Auth, $location, $mdDialog) {
+app.controller('SignupCtrl', ['$scope', 'Facebook', 'Auth', '$location', '$mdDialog', '$state', function($scope, Facebook, Auth, $location, $mdDialog, $state) {
     var refresh;
 
     $scope.newUser = {};
@@ -263,10 +153,15 @@ app.controller('SignupCtrl', ['$scope', 'Facebook', 'Auth', '$location', '$mdDia
         //console.log($scope.newUser);
         //console.log($scope.signupForm.$valid);
         if ($scope.signupForm.$valid) {
-            Auth.signup($scope.newUser).then(function(response) {
-                Auth.saveToken(response.token);
-                console.log(response);
-            });
+            Auth.signup($scope.newUser).then(
+                function(r) {
+
+                    $state.go('web.app.dashboard.home');
+                    //console.log(r);
+                },
+                function(r) {
+                    //console.log(r);
+                });
         }
     };
 
@@ -278,9 +173,48 @@ app.controller('LogoutCtrl', ['$scope', 'Auth', 'Me', function($scope, Auth, Me)
     console.log("mayama");
 }]);
 
-app.controller('ProfileCtrl', ['profile', '$scope', '$stateParams', '$state', function(profile, $scope, $stateParams, $state) {
-    $scope.profile = profile.data;
+app.controller('ProfileCtrl', ['Restangular', '$scope', '$stateParams', '$state', function(Restangular, $scope, $stateParams, $state) {
     //console.log(profile);
+    var user_profile = Restangular.one('users', $stateParams.hash_id);
+
+    $scope.user = {
+        profile: {},
+        activities: [],
+        favorites: [],
+        taps: []
+    };
+
+
+    var loadUserProfile = function() {
+        user_profile.one('profile').get().then(function(r) {
+            $scope.user.profile = r.data;
+        });
+    };
+
+    var loadUserPosts = function() {
+        user_profile.all('activities').getList().then(function(r) {
+            $scope.user.activities = r.data;
+        });
+    };
+
+    var loadUserFavorites = function() {
+        user_profile.all('favorites').getList().then(function(r) {
+            $scope.user.favorites = r.data;
+        });
+    };
+
+    var loadUserTaps = function() {
+        user_profile.all('taps').getList().then(function(r) {
+            $scope.user.taps = r.data;
+        });
+    };
+
+    loadUserProfile();
+    loadUserPosts();
+    loadUserFavorites();
+    loadUserTaps();
+
+
 }]);
 
 app.controller('UXModalLoginCtrl', ['$scope', '$mdDialog', function($scope, $mdDialog) {
@@ -295,7 +229,11 @@ app.controller('UXModalLoginCtrl', ['$scope', '$mdDialog', function($scope, $mdD
     };
 }]);
 
-app.controller('UXModalPostCategorizeCtrl', ['$scope', '$mdDialog', function($scope, $mdDialog) {
+app.controller('UXModalPostCategorizeCtrl', ['$scope', '$mdDialog', 'AppService', function($scope, $mdDialog, AppService) {
+
+    AppService.getCategories.then(function(res) {
+        $scope.categories = res.data;
+    });
     $scope.hide = function() {
         $mdDialog.hide();
     };
@@ -303,6 +241,8 @@ app.controller('UXModalPostCategorizeCtrl', ['$scope', '$mdDialog', function($sc
         $mdDialog.cancel();
     };
     $scope.filePostIn = function(id) {
+        console.log($scope.selectedCategories);
+
         $mdDialog.hide(id);
     };
 }]);

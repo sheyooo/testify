@@ -31,9 +31,9 @@ class AuthMiddleware extends \Slim\Middleware
 
 
         $open_access_endpoints = [
-            ["method" => "GET",
-                "url" => "/\/cele/"],
-
+            array(
+                'method' => 'GET',
+                'url' => "/\/cele/"),
             array(
                 'method' => 'POST',
                 'url' => "/\/authenticate/"),
