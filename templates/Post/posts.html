@@ -1,13 +1,20 @@
 <div layout="column" layout-align="center center">
-    <md-progress-circular md-mode="indeterminate" ng-show="posts_stats.loading" md-diameter="60"></md-progress-circular>
+    <md-progress-circular md-mode="indeterminate" ng-if="post_status.loading" md-diameter="100px"></md-progress-circular>
     <div layout="column" style="width: 100%">
-        <md-card ng-if=" !posts_stats.loading && !posts.length">
-            <md-card-content>
-                <h4 class="text-center">
-                        No posts
-                    </h4>
-            </md-card-content>
-        </md-card>
+        <div ng-if=" !post_status.loading && !posts.length" layout="column">
+            <div layout="row" layout-align="center center">
+                <my-icon class="text-muted" icon="comment-alert-outline" id="no-posts-iconography"></my-icon>
+                <style type="text/css">
+                #no-posts-iconography:before {
+                    font-size: 100px;
+                    color: #ccc;
+                }
+                </style>
+            </div>
+            <h2 class="text-center" style="color: #aaa">
+                No posts
+            </h2>
+        </div>
         <div ng-repeat="post in posts track by post.hash_id ">
             <md-card testify-post="post" class="md-warn">
             </md-card>

@@ -21,19 +21,19 @@
                             <input placeholder="Password" class="form-control input-lg" type="password" ng-model="loginDetails.password">
                         </div>
                         <div layout="row" layout-wrap layout-align="center center">
-                            <md-button flex="100" flex-md="100" flex-sm="100" class="md-accent md-hue-1 btn-border" type="submit">
-                                <i class="fa fa-sign-in fa-lg"></i> Login
+                            <md-button flex="100" flex-md="100" flex-sm="100" class="md-raised md-accent md-hue-1" type="submit">
+                                <my-icon icon="login"></my-icon> Login
                             </md-button>
-                            <md-button class="md-primary md-hue-2 btn-border" flex="100" ui-sref="web.app.signup">
-                                <my-icon>account-plus</my-icon>
+                            <md-button class="md-raised md-primary md-hue-2" flex="100" ui-sref="web.app.signup">
+                                <my-icon icon="account-plus"></my-icon>
                                 Sign up
                             </md-button>
                             <md-button class="md-raised" flex="100" flex-sm="100" flex-md="100" ng-click="loginFB()" style="color: white; background: #4E69A2">
-                                <i class="fa fa-facebook fa-lg mr10"></i> {{fb_button}}
+                                <my-icon icon="facebook" class="mr10"></my-icon> {{fb_button || 'Login with Facebook'}}
                             </md-button>
                         </div>
                         <div layout="column" layout-align="center center">
-                            <a ui-sref="web.app.landing" class="text-muted md-body-1">Forgot password?</a>
+                            <a ui-sref="web.app.forgot" class="text-muted md-body-1">Forgot password?</a>
                         </div>
                     </form>
                 </div>

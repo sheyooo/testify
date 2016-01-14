@@ -1,42 +1,37 @@
 <md-content flex class="main bg-light-gray" layout-sm="column" layout-gt-md="column" layout-fill ng-cloak>
-    <div layout="row" layout-align="center center">
-        <div searchbox flex="60">
-        </div>
-    </div>
     <div layout-gt-sm="row" layout-xs="column" layout-fill>
         <div flex-xs flex-gt-sm="40" layout="column" style="">
             <md-card ng-cloak>
+                <md-toolbar class="md-primary">
+                    <div class="md-toolbar-tools" layout="row">
+                        <span flex>
+                        </span>
+                        <div layout="row" layout-align="end center">
+                            <md-button class="md-icon-button" aria-label="Message {{user.profile.name}}">
+                                <my-icon icon="message-text-outline"></my-icon>
+                            </md-button>
+                            <md-menu class="no-p">
+                                <md-button aria-label="Open Menu" ng-click="openMenu($mdOpenMenu, $event)" class="md-icon-button">
+                                    <my-icon md-menu-origin icon="dots-horizontal"></my-icon>
+                                </md-button>
+                                <md-menu-content width="2">
+                                    <md-menu-item>
+                                        <md-button ng-click="logout()">
+                                            <my-icon class="text-muted" icon="logout"></my-icon>
+                                            Report
+                                        </md-button>
+                                    </md-menu-item>
+                                </md-menu-content>
+                            </md-menu>
+                        </div>
+                    </div>
+                </md-toolbar>
                 <md-card-content>
                     <div layout="row" layout-align="center center ">
                         <div flex="75" class="square-img-container img-circle img-thumbnail ">
                             <img class="img-circle" ng-src="{{::user.profile.avatar}} " />
                         </div>
                     </div>
-                    <md-toolbar class="md-primary">
-                        <div class="md-toolbar-tools" layout="row">
-                            <div flex>
-                                {{::user.profile.name}}
-                            </div>
-                            <div flex layout="row" layout-align="end center">
-                                <md-button class="md-icon-button" aria-label="Message {{user.profile.name}}">
-                                    <my-icon icon="message-text-outline"></my-icon>
-                                </md-button>
-                                <md-menu class="no-p">
-                                    <md-button aria-label="Open Menu" ng-click="openMenu($mdOpenMenu, $event)" class="md-icon-button">
-                                        <my-icon md-menu-origin icon="dots-horizontal"></my-icon>
-                                    </md-button>
-                                    <md-menu-content width="2">
-                                        <md-menu-item>
-                                            <md-button ng-click="logout()">
-                                                <my-icon class="text-muted" icon="logout"></my-icon>
-                                                Report
-                                            </md-button>
-                                        </md-menu-item>
-                                    </md-menu-content>
-                                </md-menu>
-                            </div>
-                        </div>
-                    </md-toolbar>
                     <div class="text-muted ">
                         <p class="md-title ">
                             <my-icon icon="account" class="md-primary md-hue-1 mr25 "></my-icon>{{::user.profile.name}} </p>

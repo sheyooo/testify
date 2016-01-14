@@ -299,7 +299,7 @@ app.factory('UXService', ['$mdDialog', '$mdToast', 'Auth', '$q', '$document', fu
         $mdDialog.show({
                 controller: 'UXModalLoginCtrl',
                 templateUrl: 'partials/ux.signin.modal.html',
-                parent: document.getElementsByClassName("middle-content"),
+                parent: document.getElementsByClassName("dialog-holder"),
                 targetEvent: ev,
                 clickOutsideToClose: true
             })
@@ -310,27 +310,6 @@ app.factory('UXService', ['$mdDialog', '$mdToast', 'Auth', '$q', '$document', fu
             });
 
         return d.promise;
-    };
-
-    var categorySelectModal = function(ev) {
-        var d = $q.defer();
-        return $mdDialog.show({
-            controller: 'UXModalPostCategorizeCtrl',
-            templateUrl: 'partials/ux.post.categorize.modal.html',
-            hasBackdrop: false,
-            parent: angular.element(document.querySelector('.middle-content')),
-            targetEvent: ev,
-            clickOutsideToClose: true
-        });
-        /*
-            .then(function(res) {
-                d.resolve(res);
-                //console.log(res);
-            }, function() {
-                d.reject();
-            });
-
-        return d.promise;*/
     };
 
     var alert = function(ev, text) {
@@ -382,7 +361,6 @@ app.factory('UXService', ['$mdDialog', '$mdToast', 'Auth', '$q', '$document', fu
     return {
 
         signinModal: signinModal,
-        filePostModal: categorySelectModal,
         alert: alert,
         toast: toast,
         UXLoginFB: UXLoginFB,

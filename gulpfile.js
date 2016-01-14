@@ -5,6 +5,7 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     ngAnnotate = require('gulp-ng-annotate'),
     mainBowerFiles = require('main-bower-files'),
+    sass = require('gulp-sass'),
     browserSync = require('browser-sync');
 
 var bower_js_files = ["bower_components/jquery/dist/jquery.min.js",
@@ -25,37 +26,63 @@ var bower_js_files = ["bower_components/jquery/dist/jquery.min.js",
     "plugins/ng-text-truncate/ng-text-truncate.js",
     "bower_components/ngEmbed/dist/ng-embed.min.js",
     "bower_components/ng-file-upload/ng-file-upload.min.js",
+    "bower_components/ng-img-crop/compile/minified/ng-img-crop.js",
     "bower_components/angular-emoji-popup/dist/js/config.js",
     "bower_components/angular-emoji-popup/dist/js/emoji.min.js",
     "bower_components/angular-elastic/elastic.js"
 ];
 
+var bower_css_files = [];
+
+var sass_files = [
+    'css/scss/app.scss',
+    'css/main.css',
+    "bower_components/ng-img-crop/compile/minified/ng-img-crop.css",
+    'bower_components/animate.css/animate.min.css',
+    'css/ux-animations.css'
+];
+
 
 gulp.task('js', function() {
-    return gulp.src(['js/*.js', 'controllers/*.js', 'directives/*.js', 'filters/*.js', 'services/*.js'])
+    return gulp.src(['js/**/*.js'], {
+            base: 'js'
+        })
         .pipe(sourcemaps.init({
-            loadMaps: true
+            debug: true
         }))
         .pipe(ngAnnotate())
         .pipe(jshint())
         .pipe(jshint.reporter('default'))
         .pipe(uglify())
         .pipe(concat('app.js'))
-        .pipe(sourcemaps.write('maps', {
-            sourceRoot: '/'
-        }))
+        .pipe(sourcemaps.write('../maps'))
         .pipe(gulp.dest('dist'));
+});
+
+gulp.task('css', function() {
+    gulp.src(sass_files)
+        .pipe(sourcemaps.init())
+        .pipe(sass({
+            outputStyle: 'compressed'
+        }))
+        //.pipe(uglify())
+        .pipe(concat('all.css'))
+        .pipe(sourcemaps.write('../maps'))
+        .pipe(gulp.dest('css'));
 });
 
 gulp.task('js_libs', function() {
     return gulp.src(bower_js_files)
+        .pipe(sourcemaps.init())
         .pipe(uglify())
         .pipe(concat('libs.js'))
+        .pipe(sourcemaps.write('../maps'))
         .pipe(gulp.dest('dist'));
 });
 
 gulp.task('watch', function() {
-    gulp.watch(['js/*.js', 'controllers/*.js', 'directives/*.js', 'filters/*.js', 'services/*.js'], ['js']);
+    gulp.watch(['js/**/*.js'], ['js']);
+    gulp.watch(sass_files, ['css']);
 
 });
 

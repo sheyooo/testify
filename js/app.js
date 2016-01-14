@@ -10,6 +10,7 @@ var app = angular.module('testify', ['ngMaterial',
     'restangular',
     'facebook',
     'ngFileUpload',
+    'ngImgCrop',
     'ngTextTruncate',
     'emojiApp'
 ]);
@@ -34,7 +35,8 @@ app.config(function(FacebookProvider, $httpProvider, RestangularProvider, apiBas
                 return config;
             },
             'response': function(response) {
-                if (t = response.headers('Authorization')) {
+                var t = response.headers('Authorization');
+                if (t) {
                     t.replace('Bearer ', '');
                     $localStorage.token = t;
                     //console.log(t);

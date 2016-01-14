@@ -34,7 +34,7 @@ p,
 }
 
 .mdi::before {
-    font-size: 24px !important;
+    font-size: 24px;
     position: relative;
     top: 6px;
 }
@@ -94,13 +94,11 @@ p,
 }
 
 .entrance-bg {
-    background: url('../img/1.jpg');
-    background-size: cover;
-    background-attachment: fixed;
+    background: url('../img/1.jpg') no-repeat 0% 0% /cover;
 }
 
 .login-bg {
-    background: url("../img/concert.jpg") no-repeat fixed 0% 0% /cover;
+    background: url("../img/concert.jpg") no-repeat 0% 0% /cover;
 }
 
 // Angular
@@ -112,7 +110,7 @@ p,
 
 // Main content bg color
 .bg-light-gray {
-    background-color: $gray;
+    background-color: $gray !important;
 }
 
 // Navigation drawer pattern: https://www.google.com/design/spec/patterns/navigation-drawer.html#navigation-drawer-specs
@@ -224,7 +222,7 @@ img {
 }
 
 .composer-img-upload-progress {
-    margin: auto;
+    margin: auto !important;
     position: absolute;
     top: 0;
     left: 0;
@@ -290,12 +288,35 @@ img {
         color: #5DADE0;
     }
     & .sidenav-item .md-button {
+        color: #777;
+        font-weight: bolder;
+        text-transform: none;
+        text-align: left;
+        width: 100%;
         display: block;
-        border-radius: 0;
-        margin: 10px 0px;
+        padding-bottom: 5px;
+        margin: 5px 0px;
+        & .mdi {
+            color: #999;
+        }
     }
 }
 
 .md-button.btn-border {
     border: solid 1px;
+}
+
+.md-button.no-text-transform {
+    text-transform: none;
+}
+
+.md-button.no-shadow {
+    box-shadow: none !important;
+}
+
+.absolute-center-horizontal {
+    position: absolute;
+    margin: 0 auto;
+    left: 0px;
+    right: 0px;
 }

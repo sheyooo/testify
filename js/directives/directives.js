@@ -52,6 +52,7 @@ app.directive('testifyPosts', ['PostService', function(PostService) {
         templateUrl: 'templates/Post/posts.html',
         scope: {
             posts: '=testifyPosts',
+            post_status: '=postStatus'
         },
         controller: function($scope) {
             //console.log($scope.posts);
@@ -69,6 +70,8 @@ app.directive('testifyPosts', ['PostService', function(PostService) {
                 });
 
             };
+
+            $scope.noPosts = false;
 
         }
     };
@@ -99,6 +102,7 @@ app.directive('testifyPost', ['PostService', 'CommentService', 'Auth', 'UXServic
                 if (scope.post.user_ref_activities.length > 0) {
                     interpretation = '';
                     i = 0;
+                    var action;
                     var ref_activities = scope.post.user_ref_activities;
                     l = scope.post.user_ref_activities.length;
 
@@ -109,7 +113,7 @@ app.directive('testifyPost', ['PostService', 'CommentService', 'Auth', 'UXServic
                             ' ' + actions[a_t][1];
                     } else if (l == 2) {
 
-                        for (var action in ref_activities) {
+                        for (action in ref_activities) {
                             i++;
                             a_t = ref_activities[action].action_type;
 
@@ -122,7 +126,7 @@ app.directive('testifyPost', ['PostService', 'CommentService', 'Auth', 'UXServic
                             }
                         }
                     } else if (l > 2) {
-                        for (var action in ref_activities) {
+                        for (action in ref_activities) {
                             i++;
                             a_t = ref_activities[action].action_type;
                             if (i == l - (l - 1)) {
@@ -335,162 +339,6 @@ app.directive('testifyComposer', [function() {
     return {
         restrict: 'A',
         templateUrl: 'partials/testifyComposer.html',
-        controller: function($scope, UXService, AppService, $mdToast, Me, Upload,
-            apiBase, $timeout, $document, $q) {
-            $scope.selectCategories = ['general'];
-            $scope.files = [];
-            $scope.newPost = {
-                creating: false
-            };
-            var categories = [];
-
-            AppService.getCategories.then(function(cats) {
-                $scope.categories = cats.data;
-                //console.log(tags);
-            });
-
-            $scope.selectCategories = function(evt) {
-                UXService.filePostModal(evt);
-
-                //uxmodal popup or angular ui popup
-            };
-
-
-            var isUploadFinished = function() {
-                finished = true;
-
-                angular.forEach($scope.files, function(file, key) {
-                    if (file.complete !== true) {
-                        finished = false;
-                    }
-
-                });
-                return finished;
-            };
-
-            $scope.removePicture = function(i) {
-                console.log('kk');
-                $scope.files.splice(i, 1);
-            };
-
-            var uploadImages = function(files) {
-                var d = $q.defer();
-                var finished = [];
-
-                $scope.files = files;
-
-                var doUpload = function(file) {
-                    file.file = file;
-                    file.upload = Upload.upload({
-                        url: apiBase + '/images',
-                        data: {
-                            file: file
-                        }
-                    });
-
-                    file.upload.then(function(response) {
-                        file.complete = true;
-                        file.result = response.data;
-                        //console.log(response);
-                        finished.push(response.data.image_id);
-
-                        if (files.length == finished.length) {
-                            d.resolve(finished);
-                        }
-                    }, function(response) {
-                        file.failed = true;
-                        if (files.length == finished.length) {
-                            d.resolve(finished);
-                        }
-                    }, function(evt) {
-                        file.progress = Math.min(100, parseInt(100.0 *
-                            evt.loaded / evt.total));
-                    });
-                };
-
-                if (files && files.length) {
-                    angular.forEach(files, function(file) {
-                        doUpload(file);
-                    });
-
-
-                }
-                return d.promise;
-
-            };
-
-            $scope.composePost = function(ev) {
-                //post = "";
-                //console.log($scope);
-                post = $scope.post;
-                anonymous = $scope.anonymous;
-
-                if (!post) {
-                    post = " ";
-                }
-
-                if (anonymous.$viewValue === false || anonymous === false) {
-                    anonymous = 0;
-                } else {
-                    anonymous = 1;
-                }
-
-                var createPost = function(o) {
-                    //console.log(Me.sendPost);
-                    $scope.newPost.creating = true;
-                    var cats = [];
-
-                    angular.forEach($scope.chips, function(value, key) {
-                        cats.push(value.id);
-                    });
-
-
-                    Me.sendPost({
-                        post: o.p,
-                        anonymous: o.a,
-                        categories: cats,
-                        images: o.i
-                    }).then(function(r) {
-                        $scope.newPost.creating = false;
-                        $scope.post = "";
-                        $scope.composingPost = false;
-                        $scope.files = [];
-                        $scope.chips = [];
-
-                        //console.log(r);
-                        //console.log($scope.posts);
-                        if (r.status === 201) {
-                            $scope.app.posts.unshift(r.data);
-                            //console.log(r.data);
-                        }
-                    }, function(r) {
-                        $scope.newPost.creating = false;
-                    });
-                };
-
-                if ($scope.files.length) {
-                    uploadImages($scope.files).then(
-                        function(id_arr) {
-                            //console.log(id_arr);
-                            createPost({
-                                p: post.trim(),
-                                a: anonymous,
-                                i: id_arr
-                            });
-                        });
-                } else {
-                    if (post.trim()) {
-                        createPost({
-                            p: post.trim(),
-                            a: anonymous,
-                            i: []
-                        });
-                    } else {
-                        UXService.alert(ev, "Post can't be empty!");
-                    }
-
-                }
-            };
-        }
+        //controller: 'TComposerCtrl'
     };
 }]);

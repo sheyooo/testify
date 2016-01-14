@@ -1,4 +1,4 @@
-<md-dialog aria-label="File your post" ng-cloak flex="50" flex-md="70" flex-sm="95">
+<md-dialog actives="selectedCategories" aria-label="File your post" ng-cloak flex="50" flex-md="70" flex-sm="95">
     <md-toolbar>
         <div class="md-toolbar-tools">
             <h4 class="flex text-center">Please choose a category to organize your post</h4>
@@ -12,7 +12,7 @@
             <div layout="column" flex="100">
                 <md-list-item ng-repeat="c in categories">
                     <p> {{ ::c.name }} </p>
-                    <md-checkbox class="md-secondary" ng-model="selectedCategories"></md-checkbox>
+                    <md-checkbox class="md-secondary" ng-model="c.selected"></md-checkbox>
                 </md-list-item>
                 <md-button ng-click="filePostIn(cats, $event)">Done</md-button>
             </div>
